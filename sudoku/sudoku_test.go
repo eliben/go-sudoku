@@ -12,4 +12,5 @@ func TestNew(t *testing.T) {
 	}
 
 	fmt.Println(s.units[20])
+	fmt.Println(s.peers[20])
 }

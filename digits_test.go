@@ -103,3 +103,12 @@ func TestAddRemoveAllSize(t *testing.T) {
 		})
 	}
 }
+
+func TestFullDigitsSet(t *testing.T) {
+	d := fullDigitsSet()
+	for dig := uint16(1); dig <= 9; dig++ {
+		if !d.isMember(dig) {
+			t.Errorf("got isMember=false for %v, want true", dig)
+		}
+	}
+}

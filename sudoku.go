@@ -1,6 +1,10 @@
 package sudoku
 
-import "golang.org/x/exp/slices"
+import (
+	"fmt"
+
+	"golang.org/x/exp/slices"
+)
 
 // Index represents a square on the Sudoku board; it's a number in the inclusive
 // range [0, 80] that stands for row*9+col.
@@ -115,6 +119,51 @@ func New() *Sudoku {
 		units:    units,
 		peers:    peers,
 	}
+}
+
+// parseGrid parses a Sudoku grid in a simplified representation, and returns
+// it as Values. The simplified representation is as described in
+// http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the
+// set [0123456789.], where 0 or . mean "unassigned". All other runes in the
+// string are ignored.
+// This function will assign grid digits to an initial Values, so it may perform
+// some constraint propagation on the grid if it's easily solvable.
+// It returns an error if there was an issue parsing the grid, of if the grid
+// isn't a valid Sudoku grid (e.g. contradictions exist).
+func (s *Sudoku) parseGrid(str string) (Values, error) {
+	var dgs []uint16
+
+	// Iterate and grab only the supported runes; ignore all others.
+	for _, r := range str {
+		if r >= '0' && r <= '9' {
+			dgs = append(dgs, uint16(r)-uint16('0'))
+		} else if r == '.' {
+			dgs = append(dgs, 0)
+		}
+	}
+
+	//fmt.Println(dgs)
+
+	if len(dgs) != 81 {
+		return nil, fmt.Errorf("got only %v digits in grid, want 81", len(dgs))
+	}
+
+	// Start by creating a nominal Values with all candidates set for all squares.
+	// (any square can have any value at this point).
+	values := make(Values, 81)
+	for sq := range values {
+		values[sq] = fullDigitsSet()
+	}
+
+	// Assign square digits based on the parsed grid. Note that this runs
+	// constraint propagation and may discover contradictions.
+	for sq, d := range dgs {
+		if d != 0 && !s.assign(values, sq, d) {
+			return nil, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
+		}
+	}
+
+	return values, nil
 }
 
 // assign attempts to assign digit to the given square in values, propagating

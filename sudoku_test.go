@@ -1,6 +1,7 @@
 package sudoku
 
 import (
+	"fmt"
 	"testing"
 
 	"golang.org/x/exp/slices"
@@ -30,6 +31,12 @@ func TestNew(t *testing.T) {
 	if !slices.Equal(wantPeers, gotPeers) {
 		t.Errorf("got peers[20]=%v\n want %v", s.peers[20], wantPeers)
 	}
+}
+
+func TestParseGrid(t *testing.T) {
+	s := New()
+	v, err := s.parseGrid("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
+	fmt.Println(v, err)
 }
 
 func BenchmarkSudokuNew(b *testing.B) {

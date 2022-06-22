@@ -13,6 +13,11 @@ type Digits uint16
 //
 // has the bits N=1,5,6 are set, so it represents the set of digits {1, 5, 6}
 
+// fullDigitsSet returns a Digits with all possible digits set.
+func fullDigitsSet() Digits {
+	return 0b0000001111111110
+}
+
 // isMember checks whether digit n is a member of the digit set d.
 func (d Digits) isMember(n uint16) bool {
 	return (d & (1 << n)) != 0

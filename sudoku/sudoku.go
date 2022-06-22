@@ -1,5 +1,7 @@
 package sudoku
 
+import "github.com/eliben/go-sudoku/slices"
+
 // Digits represents a set of possible digits for a Sudoku square.
 type Digits = uint16
 
@@ -16,7 +18,13 @@ func index(row, col int) Index {
 }
 
 type Sudoku struct {
+	// unitlist is the list of all units that exist on the board.
 	unitlist []Unit
+
+	// units maps an index to a list of units that contain that square.
+	// The mapping is a slice, i.e. units[i] is a list of all the units
+	// that contain the square with index i.
+	units [][]Unit
 }
 
 func New() *Sudoku {
@@ -54,6 +62,18 @@ func New() *Sudoku {
 		}
 	}
 
+	// For each index i, units[i] is a list of all units that contain i.
+	units := make([][]Unit, 81)
+	for i := 0; i < 81; i++ {
+		for _, unit := range unitlist {
+			if slices.Index(unit, i) >= 0 {
+				units[i] = append(units[i], slices.Clone(unit))
+			}
+		}
+	}
+
 	return &Sudoku{
-		unitlist: unitlist}
+		unitlist: unitlist,
+		units:    units,
+	}
 }

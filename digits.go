@@ -11,6 +11,12 @@ type Digits = uint16
 //
 // has the bits N=1,5,6 are set, so it represents the set of digits {1, 5, 6}
 
-func isSet(d Digits, n uint16) bool {
+// isMember checks whether digit n is a member of the digit set d.
+func isMember(d Digits, n uint16) bool {
 	return (d & (1 << n)) != 0
+}
+
+// add adds digit n to set d and returns the new set.
+func add(d Digits, n uint16) Digits {
+	return d | (1 << n)
 }

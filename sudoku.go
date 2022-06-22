@@ -20,9 +20,6 @@ import "golang.org/x/exp/slices"
 // 72 73 74 | 75 76 77 | 78 79 80
 type Index = int
 
-// Digits represents a set of possible digits for a Sudoku square.
-type Digits = uint16
-
 // Unit is a list of square indices that belong to the same Sudoku
 // unit - a row, column or 3x3 block which should contain unique digits.
 type Unit = []Index

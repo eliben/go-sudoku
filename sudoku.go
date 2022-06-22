@@ -29,6 +29,12 @@ func index(row, col int) Index {
 	return row*9 + col
 }
 
+// Values represents a Sudoku board with an entry per square and a list of
+// all digits that could be assigned to this square per entry. For a value
+// v of type Values, v[i] is all the digits that could still be legally assigned
+// to square i.
+type Values []Digits
+
 type Sudoku struct {
 	// unitlist is the list of all units that exist on the board.
 	unitlist []Unit
@@ -109,4 +115,35 @@ func New() *Sudoku {
 		units:    units,
 		peers:    peers,
 	}
+}
+
+// assign attempts to assign digit to the given square in values, propagating
+// constraints from the assignment. values is modified.
+// It returns true if the assignment succeeded, and false if the assignment
+// fails resulting in an invalid Sudoku board.
+func (s *Sudoku) assign(values Values, square Index, digit uint16) bool {
+	for d := uint16(1); d <= 9; d++ {
+		// For each digit 1..9 that's not digit, if this digit is set in
+		// values[square] try to eliminate it.
+		// TODO: iteration may be inefficient -- is there a beter way?
+		if values[square].isMember(d) && d != digit {
+			if !s.eliminate(values, square, digit) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// eliminates removes digit from the options for square in values, propagating
+// constraints. values is modified.
+// It returns false if this results in an invalid Sudoku board; otherwise
+// returns true.
+func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
+	if !values[square].isMember(digit) {
+		// Already eliminated
+		return true
+	}
+
+	return true
 }

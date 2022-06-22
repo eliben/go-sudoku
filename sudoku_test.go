@@ -31,3 +31,10 @@ func TestNew(t *testing.T) {
 		t.Errorf("got peers[20]=%v\n want %v", s.peers[20], wantPeers)
 	}
 }
+
+func BenchmarkSudokuNew(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bn := New()
+		_ = bn
+	}
+}

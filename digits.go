@@ -20,3 +20,8 @@ func (d Digits) isMember(n uint16) bool {
 func (d Digits) add(n uint16) Digits {
 	return d | (1 << n)
 }
+
+// remove removes digit n from set d and returns the new set.
+func (d Digits) remove(n uint16) Digits {
+	return d &^ (1 << n)
+}

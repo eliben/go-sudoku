@@ -1,5 +1,7 @@
 package sudoku
 
+import "math/bits"
+
 // Digits represents a set of possible digits for a Sudoku square. The functions
 // in this file perform set operations on Digits, as needed for Sudoku.
 type Digits uint16
@@ -24,4 +26,15 @@ func (d Digits) add(n uint16) Digits {
 // remove removes digit n from set d and returns the new set.
 func (d Digits) remove(n uint16) Digits {
 	return d &^ (1 << n)
+}
+
+// size returns the size of the set - the number of digits in it.
+func (d Digits) size() int {
+	return bits.OnesCount16(uint16(d))
+}
+
+// singleOnOffset returns the digit that's a member of a 1-element set; this
+// assumes that the set indeed has a single element.
+func (d Digits) singleMemberOffset() uint16 {
+	return uint16(bits.TrailingZeros16(uint16(d)))
 }

@@ -50,7 +50,7 @@ func TestRemove(t *testing.T) {
 	}
 }
 
-func TestAddRemoveAll(t *testing.T) {
+func TestAddRemoveAllSize(t *testing.T) {
 	// Exhaustive testing that adds/removes every digits and tests that isMember
 	// also keeps working.
 
@@ -59,6 +59,10 @@ func TestAddRemoveAll(t *testing.T) {
 	d := Digits(0)
 
 	testNoMembers := func() {
+		if d.size() != 0 {
+			t.Errorf("got size=%v, want 0", d.size())
+		}
+
 		for dig := uint16(1); dig <= 9; dig++ {
 			if d.isMember(dig) {
 				t.Errorf("got isMember=true for %v, want false", dig)
@@ -71,6 +75,15 @@ func TestAddRemoveAll(t *testing.T) {
 		t.Run(fmt.Sprintf("dig=%v", dig), func(t *testing.T) {
 			// Add 'dig' to set
 			d = d.add(dig)
+
+			if d.size() != 1 {
+				t.Errorf("got size=%v, want 1", d.size())
+			}
+
+			off := d.singleMemberOffset()
+			if off != dig {
+				t.Errorf("got singleMemberOffset=%v, want %v", off, dig)
+			}
 
 			// For each 'dig2', check set membership
 			for dig2 := uint16(1); dig2 <= 9; dig2++ {

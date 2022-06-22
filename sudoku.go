@@ -145,5 +145,46 @@ func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
 		return true
 	}
 
+	// Remove digit from the candidates in square.
+	values[square] = values[square].remove(digit)
+
+	switch values[square].size() {
+	case 0:
+		// No remaining options for square -- this is a contradiction.
+		return false
+	case 1:
+		// A single digit candidate remaining in the square -- this creates a new
+		// constraint. Eliminate this digit from all peer squares.
+		remaining := values[square].singleMemberOffset()
+		for _, peer := range s.peers[square] {
+			if !s.eliminate(values, peer, remaining) {
+				return false
+			}
+		}
+	}
+
+	// Since digit was eliminated from square, it's possible that we'll find a
+	// position for this digit in one of the units the square belongs to.
+	for _, unit := range s.units[square] {
+		// dplaces is a list of squares in this unit that have 'digit' as one of
+		// their candidates.
+		var dplaces []Index
+		for _, sq := range unit {
+			if values[sq].isMember(digit) {
+				dplaces = append(dplaces, sq)
+			}
+		}
+		if len(dplaces) == 0 {
+			// Contradiction: no places left in this unit for 'digit'
+			return false
+		} else if len(dplaces) == 1 {
+			// There's only a single place left in the unit for 'digit' to go, so
+			// assign it.
+			if !s.assign(values, dplaces[0], digit) {
+				return false
+			}
+		}
+	}
+
 	return true
 }

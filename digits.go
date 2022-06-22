@@ -1,6 +1,10 @@
 package sudoku
 
-import "math/bits"
+import (
+	"fmt"
+	"math/bits"
+	"strings"
+)
 
 // Digits represents a set of possible digits for a Sudoku square. The functions
 // in this file perform set operations on Digits, as needed for Sudoku.
@@ -42,4 +46,15 @@ func (d Digits) size() int {
 // assumes that the set indeed has a single element.
 func (d Digits) singleMemberOffset() uint16 {
 	return uint16(bits.TrailingZeros16(uint16(d)))
+}
+
+// String implements the fmt.Stringer interface for Digits.
+func (d Digits) String() string {
+	var parts []string
+	for i := uint16(1); i <= uint16(9); i++ {
+		if d.isMember(i) {
+			parts = append(parts, fmt.Sprintf("%v", i))
+		}
+	}
+	return strings.Join(parts, "")
 }

@@ -25,6 +25,10 @@ func TestIsMember(t *testing.T) {
 func TestAdd(t *testing.T) {
 	d := Digits(0b0000000001100010)
 
+	if d.String() != "156" {
+		t.Errorf("got %v, want 156", d.String())
+	}
+
 	wantd2 := Digits(0b0000000001100110)
 	if d.add(2) != wantd2 {
 		t.Errorf("got wantd2=%v, want=%v", d.add(2), wantd2)
@@ -47,6 +51,16 @@ func TestRemove(t *testing.T) {
 	wantd8 := Digits(0b0000000001100010)
 	if d.remove(8) != wantd8 {
 		t.Errorf("got wantd8=%v, want=%v", d.remove(8), wantd8)
+	}
+
+	wantd6no1 := Digits(0b0000000001000000)
+	donly6 := d.remove(1).remove(5)
+	if donly6 != wantd6no1 {
+		t.Errorf("got wantd6no1=%v, want=%v", donly6, wantd6no1)
+	}
+
+	if donly6.String() != "6" {
+		t.Errorf("got %v, want 6", donly6.String())
 	}
 }
 
@@ -110,5 +124,9 @@ func TestFullDigitsSet(t *testing.T) {
 		if !d.isMember(dig) {
 			t.Errorf("got isMember=false for %v, want true", dig)
 		}
+	}
+
+	if d.String() != "123456789" {
+		t.Errorf("got %v, want all digits", d.String())
 	}
 }

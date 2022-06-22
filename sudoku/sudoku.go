@@ -1,6 +1,6 @@
 package sudoku
 
-import "github.com/eliben/go-sudoku/slices"
+import "golang.org/x/exp/slices"
 
 // Index represents a square on the Sudoku board; it's a number in the inclusive
 // range [0, 80] that stands for row*9+col.

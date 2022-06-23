@@ -210,24 +210,31 @@ func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
 
 	// Since digit was eliminated from square, it's possible that we'll find a
 	// position for this digit in one of the units the square belongs to.
+UnitLoop:
 	for _, unit := range s.units[square] {
-		// dplaces is a list of squares in this unit that have 'digit' as one of
-		// their candidates.
-		var dplaces []Index
+		// Looking for a single square in this unit that has 'digit' as one of its
+		// candidates. sqd marks the square, or -1 if no such square was found.
+		sqd := -1
 		for _, sq := range unit {
 			if values[sq].isMember(digit) {
-				dplaces = append(dplaces, sq)
+				if sqd == -1 {
+					sqd = sq
+				} else {
+					// More than one square has 'digit' as a candidate, so we won't be
+					// able to simplify things.
+					continue UnitLoop
+				}
 			}
 		}
-		if len(dplaces) == 0 {
+		if sqd == -1 {
 			// Contradiction: no places left in this unit for 'digit'
 			return false
-		} else if len(dplaces) == 1 {
-			// There's only a single place left in the unit for 'digit' to go, so
-			// assign it.
-			if !s.assign(values, dplaces[0], digit) {
-				return false
-			}
+		}
+
+		// There's only a single place left in the unit for 'digit' to go, so
+		// assign it.
+		if !s.assign(values, sqd, digit) {
+			return false
 		}
 	}
 

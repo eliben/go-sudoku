@@ -175,6 +175,37 @@ func TestIsSolved(t *testing.T) {
 	}
 }
 
+// This board is unsolvable, but it takes the search a while to figure this
+// out.
+var impossible string = `
+. . . |. . 5 |. 8 .
+. . . |6 . 1 |. 4 3
+. . . |. . . |. . .
+------+------+------
+. 1 . |5 . . |. . .
+. . . |1 . 6 |. . .
+3 . . |. . . |. . 5
+------+------+------
+5 3 . |. . . |. 6 1
+. . . |. . . |. . 4
+. . . |. . . |. . .`
+
+// Run this test but skip in "not short" mode
+func TestImpossible(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping test in short mode.")
+	}
+	s := New()
+	v, err := s.solveBoard(impossible)
+
+	if !strings.Contains(err.Error(), "not solvable") {
+		t.Errorf("got err %v; want 'not solvable'", err)
+	}
+	if s.isSolved(v) {
+		t.Errorf("got solved board for impossible")
+	}
+}
+
 func TestSolveHardest(t *testing.T) {
 	// The "hardest" puzzles Norvig found online (taken from
 	// https://norvig.com/hardest.txt)

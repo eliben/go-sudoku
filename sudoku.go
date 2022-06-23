@@ -2,6 +2,7 @@ package sudoku
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/exp/slices"
 )
@@ -236,4 +237,36 @@ func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
 	}
 
 	return true
+}
+
+// display returns a Sudoku 2D board representation of values
+func (s *Sudoku) display(values Values) string {
+	// Find maximum length of one square.
+	var maxlen int = 0
+	for _, d := range values {
+		if d.size() > maxlen {
+			maxlen = d.size()
+		}
+	}
+	width := maxlen + 1
+
+	line := strings.Join([]string{
+		strings.Repeat("-", width*3),
+		strings.Repeat("-", width*3),
+		strings.Repeat("-", width*3)}, "+")
+
+	var sb strings.Builder
+	for sq, d := range values {
+		fmt.Fprintf(&sb, "%[1]*s", -width, fmt.Sprintf("%[1]*s", (width+d.size())/2, d))
+		if sq%9 == 2 || sq%9 == 5 {
+			sb.WriteString("|")
+		}
+		if sq%9 == 8 {
+			sb.WriteRune('\n')
+		}
+		if sq == 26 || sq == 53 {
+			sb.WriteString(line + "\n")
+		}
+	}
+	return sb.String()
 }

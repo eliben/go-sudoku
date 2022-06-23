@@ -37,6 +37,8 @@ func TestParseGrid(t *testing.T) {
 	s := New()
 	v, err := s.parseGrid("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
 	fmt.Println(v, err)
+
+	fmt.Println(s.display(v))
 }
 
 func BenchmarkSudokuNew(b *testing.B) {

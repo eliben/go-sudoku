@@ -162,14 +162,14 @@ func (s *Sudoku) parseBoard(str string) (Values, error) {
 	return values, nil
 }
 
-// assign attempts to assign digit to the given square in values, propagating
+// assign attempts to assign digit to values[square], propagating
 // constraints from the assignment. values is modified.
 // It returns true if the assignment succeeded, and false if the assignment
 // fails resulting in an invalid Sudoku board.
 func (s *Sudoku) assign(values Values, square Index, digit uint16) bool {
 	for d := uint16(1); d <= 9; d++ {
-		// For each digit 1..9 that's not digit, if this digit is set in
-		// values[square] try to eliminate it.
+		// For each d 1..9 that's != digit, if d is set in
+		// values[square], try to eliminate it.
 		// TODO: iteration may be inefficient -- is there a beter way?
 		if values[square].isMember(d) && d != digit {
 			if !s.eliminate(values, square, d) {
@@ -180,7 +180,7 @@ func (s *Sudoku) assign(values Values, square Index, digit uint16) bool {
 	return true
 }
 
-// eliminates removes digit from the options for square in values, propagating
+// eliminate removes digit from the candidates in values[square], propagating
 // constraints. values is modified.
 // It returns false if this results in an invalid Sudoku board; otherwise
 // returns true.
@@ -274,4 +274,23 @@ func emptyBoard() Values {
 		vals[sq] = fullDigitsSet()
 	}
 	return vals
+}
+
+// isSolved checks whether values is a properly solved Sudoku board.
+func (s *Sudoku) isSolved(values Values) bool {
+	for _, unit := range s.unitlist {
+		var dset Digits
+		for _, sq := range unit {
+			// Some squares have more than a single candidate? Not solved.
+			if values[sq].size() != 1 {
+				return false
+			}
+			dset = dset.add(values[sq].singleMemberDigit())
+		}
+		// Not all digits covered by this unit? Not solved.
+		if dset != fullDigitsSet() {
+			return false
+		}
+	}
+	return true
 }

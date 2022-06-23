@@ -36,6 +36,10 @@ func TestAssignElimination(t *testing.T) {
 	s := New()
 	vals := emptyBoard()
 
+	if s.isSolved(vals) {
+		t.Errorf("an empty board is solved")
+	}
+
 	// Assign a digit to square 20; check that this digit is the only candidate
 	// in square 20, and that it was eliminated from all the peers of 20.
 	s.assign(vals, 20, 5)
@@ -58,11 +62,40 @@ func TestAssignElimination(t *testing.T) {
 }
 
 func TestParseBoard(t *testing.T) {
-	//s := New()
-	//v, err := s.parseBoard("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
-	//fmt.Println(v, err)
+	s := New()
+	// Easy board from Norvig's example that's solved by constraint propagation
+	// w/o any search.
+	v, err := s.parseBoard("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	//fmt.Println(s.display(v))
+	if !s.isSolved(v) {
+		t.Errorf("expect easy board to be solved")
+	}
+
+	// Harder board that isn't fully solved without search.
+	v2, err := s.parseBoard("4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if s.isSolved(v2) {
+		t.Errorf("expect hard board to not be solved")
+	}
+
+	// Count how many squares are solved immediately in this puzzle and compare
+	// to the number Norvig god.
+	var solvedSquares int
+	for _, d := range v2 {
+		if d.size() == 1 {
+			solvedSquares++
+		}
+	}
+
+	if solvedSquares != 20 {
+		t.Errorf("got %v solved squares, want 20", solvedSquares)
+	}
 }
 
 func BenchmarkSudokuNew(b *testing.B) {

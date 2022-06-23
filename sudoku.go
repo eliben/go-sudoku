@@ -34,11 +34,11 @@ func index(row, col int) Index {
 	return row*9 + col
 }
 
-// Values represents a Sudoku board with an entry per square and a list of
-// all digits that could be assigned to this square per entry. For a value
-// v of type Values, v[i] is all the digits that could still be legally assigned
-// to square i.
-type Values []Digits
+// Values represents a Sudoku board in a format that's usable for solving.
+// An element at index [i] in Values represents Sudoku square i (see the
+// documentation of the Index type), and contains a set of all candidate
+// digits for this square.
+type Values [81]Digits
 
 type Sudoku struct {
 	// unitlist is the list of all units that exist on the board.
@@ -145,21 +145,17 @@ func (s *Sudoku) parseBoard(str string) (Values, error) {
 	}
 
 	if len(dgs) != 81 {
-		return nil, fmt.Errorf("got only %v digits in board, want 81", len(dgs))
+		return Values{}, fmt.Errorf("got only %v digits in board, want 81", len(dgs))
 	}
 
-	// Start by creating a nominal Values with all candidates set for all squares.
-	// (any square can have any value at this point).
-	values := make(Values, 81)
-	for sq := range values {
-		values[sq] = fullDigitsSet()
-	}
+	// Start with an empty board.
+	values := emptyBoard()
 
 	// Assign square digits based on the parsed board. Note that this runs
 	// constraint propagation and may discover contradictions.
 	for sq, d := range dgs {
 		if d != 0 && !s.assign(values, sq, d) {
-			return nil, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
+			return Values{}, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
 		}
 	}
 
@@ -268,4 +264,14 @@ func (s *Sudoku) display(values Values) string {
 		}
 	}
 	return sb.String()
+}
+
+// emptyBoard creates an "empty" Sudoku board, where each square can potentially
+// contain any digit.
+func emptyBoard() Values {
+	var vals Values
+	for sq := range vals {
+		vals[sq] = fullDigitsSet()
+	}
+	return vals
 }

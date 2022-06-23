@@ -191,10 +191,10 @@ func TestImpossible(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 	v, err := SolveBoard(impossible)
-
-	if !strings.Contains(err.Error(), "not solvable") {
-		t.Errorf("got err %v; want 'not solvable'", err)
+	if err != nil {
+		log.Fatal(err)
 	}
+
 	if IsSolved(v) {
 		t.Errorf("got solved board for impossible")
 	}

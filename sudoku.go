@@ -291,19 +291,17 @@ func IsSolved(values Values) bool {
 }
 
 // SolveBoard solves a Sudoku board given in textual representation.
-// It returns an error if there was an issue parsing or solving the board.
+// It returns an error if there was an issue parsing the board. The returned
+// values may not have a unique assignment per square if the board was not
+// solvable.
 func SolveBoard(str string) (Values, error) {
 	values, err := ParseBoard(str)
 	if err != nil {
 		return values, err
 	}
 
-	vresult, solved := search(values)
-	if solved {
-		return vresult, nil
-	} else {
-		return vresult, fmt.Errorf("board is not solvable")
-	}
+	vresult, _ := search(values)
+	return vresult, nil
 }
 
 // search runs a backtracking search to solve the board given in values.

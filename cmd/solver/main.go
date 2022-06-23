@@ -25,8 +25,9 @@ func main() {
 	var totalDuration time.Duration = 0
 	var maxDuration time.Duration = 0
 	var numBoards int = 0
+	var numSolved int = 0
 
-	// Expect one board per line
+	// Expect one board per line, ignoring whitespace and lines starting with '#'.
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		board := strings.TrimSpace(scanner.Text())
@@ -40,7 +41,7 @@ func main() {
 		v, err := sudoku.SolveBoard(board)
 		tElapsed := time.Now().Sub(tStart)
 		if err != nil {
-			log.Fatalf("unable to parse/solve board:", err)
+			log.Fatal(err)
 		}
 
 		totalDuration += tElapsed
@@ -48,8 +49,8 @@ func main() {
 			maxDuration = tElapsed
 		}
 
-		if !sudoku.IsSolved(v) {
-			log.Fatalf("board %v is not solved", v)
+		if sudoku.IsSolved(v) {
+			numSolved++
 		}
 	}
 
@@ -57,7 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Total boards solved:", numBoards)
+	fmt.Printf("Solved %v boards out of %v\n", numSolved, numBoards)
 	fmt.Println("Average duration:", totalDuration/time.Duration(numBoards))
 	fmt.Println("Max duration:", maxDuration)
 }

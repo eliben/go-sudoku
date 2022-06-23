@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	statsFlag := flag.Bool("stats", false, "enable stats for solving")
 	flag.Parse()
 
 	filename := flag.Args()[0]
@@ -24,8 +25,13 @@ func main() {
 
 	var totalDuration time.Duration = 0
 	var maxDuration time.Duration = 0
+	var totalSearches uint64 = 0
 	var numBoards int = 0
 	var numSolved int = 0
+
+	if *statsFlag {
+		sudoku.EnableStats = true
+	}
 
 	// Expect one board per line, ignoring whitespace and lines starting with '#'.
 	scanner := bufio.NewScanner(f)
@@ -52,6 +58,11 @@ func main() {
 		if sudoku.IsSolved(v) {
 			numSolved++
 		}
+
+		if *statsFlag {
+			totalSearches += sudoku.Stats.NumSearches
+			sudoku.Stats.Reset()
+		}
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -61,4 +72,7 @@ func main() {
 	fmt.Printf("Solved %v boards out of %v\n", numSolved, numBoards)
 	fmt.Println("Average duration:", totalDuration/time.Duration(numBoards))
 	fmt.Println("Max duration:", maxDuration)
+	if *statsFlag {
+		fmt.Printf("Average searches: %.2f per board\n", float64(totalSearches)/float64(numBoards))
+	}
 }

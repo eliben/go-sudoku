@@ -122,8 +122,8 @@ func New() *Sudoku {
 	}
 }
 
-// parseBoard parses a Sudoku board in a simplified representation, and returns
-// it as Values. The simplified representation is as described in
+// parseBoard parses a Sudoku board given in textual representation, and returns
+// it as Values. The textual representation is as described in
 // http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the
 // set [0123456789.], where 0 or . mean "unassigned". All other runes in the
 // string are ignored.
@@ -145,7 +145,7 @@ func (s *Sudoku) parseBoard(str string) (Values, error) {
 	}
 
 	if len(dgs) != 81 {
-		return Values{}, fmt.Errorf("got only %v digits in board, want 81", len(dgs))
+		return nil, fmt.Errorf("got only %v digits in board, want 81", len(dgs))
 	}
 
 	// Start with an empty board.
@@ -155,7 +155,7 @@ func (s *Sudoku) parseBoard(str string) (Values, error) {
 	// constraint propagation and may discover contradictions.
 	for sq, d := range dgs {
 		if d != 0 && !s.assign(values, sq, d) {
-			return Values{}, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
+			return nil, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
 		}
 	}
 
@@ -293,4 +293,58 @@ func (s *Sudoku) isSolved(values Values) bool {
 		}
 	}
 	return true
+}
+
+// solveBoard solves a Sudoku board given in textual representation.
+// It returns an error if there was an issue parsing or solving the board.
+func (s *Sudoku) solveBoard(str string) (Values, error) {
+	values, err := s.parseBoard(str)
+	if err != nil {
+		return values, err
+	}
+
+	vresult, solved := s.search(values)
+	if solved {
+		return vresult, nil
+	} else {
+		return vresult, fmt.Errorf("board is not solvable")
+	}
+}
+
+// search runs a backtracking search to solve the board given in values.
+// It returns true and the solved values if the search succeeded and we ended up
+// with a board with only a single candidate per square; otherwise, it returns
+// false.
+func (s *Sudoku) search(values Values) (Values, bool) {
+	// Find the next square to try assignment in: this would be the square with
+	// more than 1 digit candidate, but the smallest number of such candidates.
+	var squareToTry Index = -1
+	var minSize int = 9
+	for sq, d := range values {
+		if d.size() > 1 && d.size() < minSize {
+			minSize = d.size()
+			squareToTry = sq
+		}
+	}
+
+	// If we didn't find any square with more than one candidate, the board is
+	// solved!
+	if squareToTry == -1 {
+		return values, true
+	}
+
+	// TODO: inefficient iteration again
+	for d := uint16(1); d <= 9; d++ {
+		// Try to assign sq with each one of its candidate digits. If this results
+		// in a successful search() - we've solved the board!
+		if values[squareToTry].isMember(d) {
+			vcopy := slices.Clone(values)
+			if s.assign(vcopy, squareToTry, d) {
+				if vresult, solved := s.search(vcopy); solved {
+					return vresult, true
+				}
+			}
+		}
+	}
+	return values, false
 }

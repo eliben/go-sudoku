@@ -1,6 +1,7 @@
 package sudoku
 
 import (
+	"log"
 	"testing"
 
 	"golang.org/x/exp/slices"
@@ -88,7 +89,7 @@ func TestParseBoard(t *testing.T) {
 	}
 
 	// Count how many squares are solved immediately in this puzzle and compare
-	// to the number Norvig god.
+	// to the number Norvig got.
 	var solvedSquares int
 	for _, d := range v2 {
 		if d.size() == 1 {
@@ -98,6 +99,19 @@ func TestParseBoard(t *testing.T) {
 
 	if solvedSquares != 20 {
 		t.Errorf("got %v solved squares, want 20", solvedSquares)
+	}
+}
+
+func TestSolveBoard(t *testing.T) {
+	s := New()
+	v, err := s.solveBoard(hardboard1)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !s.isSolved(v) {
+		t.Errorf("expect hard board to be solved by search")
 	}
 }
 

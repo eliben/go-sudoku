@@ -29,11 +29,6 @@ type Index = int
 // unit - a row, column or 3x3 block which should contain unique digits.
 type Unit = []Index
 
-// index calculates the linear index of a square from its row and column.
-func index(row, col int) Index {
-	return row*9 + col
-}
-
 // Values represents a Sudoku board in a format that's usable for solving.
 // An element at index [i] in Values represents Sudoku square i (see the
 // documentation of the Index type), and contains a set of all candidate
@@ -53,6 +48,10 @@ var units [][]Unit
 var peers [][]Index
 
 func init() {
+	index := func(row, col int) Index {
+		return row*9 + col
+	}
+
 	// row units
 	for row := 0; row < 9; row++ {
 		var rowUnit []Index
@@ -112,7 +111,7 @@ func init() {
 	}
 }
 
-// parseBoard parses a Sudoku board given in textual representation, and returns
+// ParseBoard parses a Sudoku board given in textual representation, and returns
 // it as Values. The textual representation is as described in
 // http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the
 // set [0123456789.], where 0 or . mean "unassigned". All other runes in the
@@ -122,7 +121,7 @@ func init() {
 // propagation throughout the board.
 // It returns an error if there was an issue parsing the board, of if the board
 // isn't a valid Sudoku board (e.g. contradictions exist).
-func parseBoard(str string) (Values, error) {
+func ParseBoard(str string) (Values, error) {
 	var dgs []uint16
 
 	// Iterate and grab only the supported runes; ignore all others.
@@ -139,7 +138,7 @@ func parseBoard(str string) (Values, error) {
 	}
 
 	// Start with an empty board.
-	values := emptyBoard()
+	values := EmptyBoard()
 
 	// Assign square digits based on the parsed board. Note that this runs
 	// constraint propagation and may discover contradictions.
@@ -160,7 +159,6 @@ func assign(values Values, square Index, digit uint16) bool {
 	for d := uint16(1); d <= 9; d++ {
 		// For each d 1..9 that's != digit, if d is set in
 		// values[square], try to eliminate it.
-		// TODO: iteration may be inefficient -- is there a beter way?
 		if values[square].isMember(d) && d != digit {
 			if !eliminate(values, square, d) {
 				return false
@@ -231,8 +229,8 @@ UnitLoop:
 	return true
 }
 
-// display returns a Sudoku 2D board representation of values
-func display(values Values) string {
+// Display returns a Sudoku 2D board representation of values
+func Display(values Values) string {
 	// Find maximum length of one square.
 	var maxlen int = 0
 	for _, d := range values {
@@ -263,9 +261,9 @@ func display(values Values) string {
 	return sb.String()
 }
 
-// emptyBoard creates an "empty" Sudoku board, where each square can potentially
+// EmptyBoard creates an "empty" Sudoku board, where each square can potentially
 // contain any digit.
-func emptyBoard() Values {
+func EmptyBoard() Values {
 	vals := make(Values, 81)
 	for sq := range vals {
 		vals[sq] = fullDigitsSet()
@@ -273,8 +271,8 @@ func emptyBoard() Values {
 	return vals
 }
 
-// isSolved checks whether values is a properly solved Sudoku board.
-func isSolved(values Values) bool {
+// IsSolved checks whether values is a properly solved Sudoku board.
+func IsSolved(values Values) bool {
 	for _, unit := range unitlist {
 		var dset Digits
 		for _, sq := range unit {
@@ -292,10 +290,10 @@ func isSolved(values Values) bool {
 	return true
 }
 
-// solveBoard solves a Sudoku board given in textual representation.
+// SolveBoard solves a Sudoku board given in textual representation.
 // It returns an error if there was an issue parsing or solving the board.
-func solveBoard(str string) (Values, error) {
-	values, err := parseBoard(str)
+func SolveBoard(str string) (Values, error) {
+	values, err := ParseBoard(str)
 	if err != nil {
 		return values, err
 	}
@@ -330,7 +328,6 @@ func search(values Values) (Values, bool) {
 		return values, true
 	}
 
-	// TODO: inefficient iteration again
 	for d := uint16(1); d <= 9; d++ {
 		// Try to assign sq with each one of its candidate digits. If this results
 		// in a successful search() - we've solved the board!

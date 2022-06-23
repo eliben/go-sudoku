@@ -34,9 +34,9 @@ func TestInit(t *testing.T) {
 }
 
 func TestAssignElimination(t *testing.T) {
-	vals := emptyBoard()
+	vals := EmptyBoard()
 
-	if isSolved(vals) {
+	if IsSolved(vals) {
 		t.Errorf("an empty board is solved")
 	}
 
@@ -83,22 +83,22 @@ var hardlong string = `
 . . . |. . . |. . .`
 
 func TestParseBoard(t *testing.T) {
-	v, err := parseBoard(easyboard1)
+	v, err := ParseBoard(easyboard1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !isSolved(v) {
+	if !IsSolved(v) {
 		t.Errorf("expect easy board to be solved")
 	}
 
 	// Harder board that isn't fully solved without search.
-	v2, err := parseBoard(hardboard1)
+	v2, err := ParseBoard(hardboard1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if isSolved(v2) {
+	if IsSolved(v2) {
 		t.Errorf("expect hard board to not be solved")
 	}
 
@@ -117,44 +117,44 @@ func TestParseBoard(t *testing.T) {
 }
 
 func TestSolveBoard(t *testing.T) {
-	v, err := solveBoard(hardboard1)
+	v, err := SolveBoard(hardboard1)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if !isSolved(v) {
+	if !IsSolved(v) {
 		t.Errorf("expect hardboard1 to be solved by search")
 	}
 
 	// Should work on the easy board also (even though it's solved with the
 	// initial parse)
-	v2, err := solveBoard(easyboard1)
+	v2, err := SolveBoard(easyboard1)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if !isSolved(v2) {
+	if !IsSolved(v2) {
 		t.Errorf("expect easy board to be solved by search")
 	}
 
 	// And the other hard board
-	v3, err := solveBoard(hardboard2)
+	v3, err := SolveBoard(hardboard2)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if !isSolved(v3) {
+	if !IsSolved(v3) {
 		t.Errorf("expect hardboard2 to be solved by search")
 	}
 }
 
 func TestIsSolved(t *testing.T) {
-	v, err := parseBoard(easyboard1)
+	v, err := ParseBoard(easyboard1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !isSolved(v) {
+	if !IsSolved(v) {
 		t.Errorf("expect easy board to be solved")
 	}
 
@@ -164,7 +164,7 @@ func TestIsSolved(t *testing.T) {
 		vcopy := slices.Clone(v)
 		vcopy[sq] = vcopy[sq].add(6).add(8)
 
-		if isSolved(vcopy) {
+		if IsSolved(vcopy) {
 			t.Errorf("expect board to not be solved after modification: %v", vcopy)
 		}
 	}
@@ -190,12 +190,12 @@ func TestImpossible(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
-	v, err := solveBoard(impossible)
+	v, err := SolveBoard(impossible)
 
 	if !strings.Contains(err.Error(), "not solvable") {
 		t.Errorf("got err %v; want 'not solvable'", err)
 	}
-	if isSolved(v) {
+	if IsSolved(v) {
 		t.Errorf("got solved board for impossible")
 	}
 }
@@ -219,12 +219,12 @@ func TestSolveHardest(t *testing.T) {
 	for _, board := range strings.Split(hardest, "\n") {
 		board = strings.TrimSpace(board)
 		if len(board) > 0 {
-			v, err := solveBoard(board)
+			v, err := SolveBoard(board)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			if !isSolved(v) {
+			if !IsSolved(v) {
 				t.Errorf("not solved board %v", board)
 			}
 		}
@@ -236,14 +236,14 @@ func BenchmarkParseBoardAssign(b *testing.B) {
 	// propagation. We know that for easyboard1 it's fully solved with
 	// constraint propagation after parsing.
 	for i := 0; i < b.N; i++ {
-		_, _ = solveBoard(hardboard2)
+		_, _ = SolveBoard(hardboard2)
 	}
 }
 
 func BenchmarkSolveBoardHardlong(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		v, err := solveBoard(hardlong)
-		if err != nil || !isSolved(v) {
+		v, err := SolveBoard(hardlong)
+		if err != nil || !IsSolved(v) {
 			panic("not solved")
 		}
 	}

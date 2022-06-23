@@ -156,6 +156,10 @@ func ParseBoard(str string) (Values, error) {
 // It returns true if the assignment succeeded, and false if the assignment
 // fails resulting in an invalid Sudoku board.
 func assign(values Values, square Index, digit uint16) bool {
+	if EnableStats {
+		Stats.NumAssigns++
+	}
+
 	for d := uint16(1); d <= 9; d++ {
 		// For each d 1..9 that's != digit, if d is set in
 		// values[square], try to eliminate it.
@@ -309,6 +313,10 @@ func SolveBoard(str string) (Values, error) {
 // with a board with only a single candidate per square; otherwise, it returns
 // false.
 func search(values Values) (Values, bool) {
+	if EnableStats {
+		Stats.NumSearches++
+	}
+
 	// Find the next square to try assignment in: this would be the square with
 	// more than 1 digit candidate, but the smallest number of such candidates.
 	var squareToTry Index = -1
@@ -339,4 +347,25 @@ func search(values Values) (Values, bool) {
 		}
 	}
 	return values, false
+}
+
+// EnableStats enables statistics collection during the processes of solving.
+// When stats are enabled, solving will be slightly slower.
+//
+// Note: statistics collection is NOT SAFE FOR CONCURRENT ACCESS.
+var EnableStats bool = false
+
+type StatsCollector struct {
+	NumSearches uint64
+	NumAssigns  uint64
+}
+
+// Stats is the global variable for accessing statistics from this package.
+// It's recommended to call Stats.Reset() before solving a board, and access
+// the Stats fields after it's done.
+var Stats StatsCollector
+
+func (s *StatsCollector) Reset() {
+	s.NumSearches = 0
+	s.NumAssigns = 0
 }

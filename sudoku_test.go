@@ -121,6 +121,7 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//fmt.Println(Stats.NumSearches, Stats.NumAssigns)
 
 	if !IsSolved(v) {
 		t.Errorf("expect hardboard1 to be solved by search")
@@ -145,6 +146,39 @@ func TestSolveBoard(t *testing.T) {
 
 	if !IsSolved(v3) {
 		t.Errorf("expect hardboard2 to be solved by search")
+	}
+}
+
+func TestSolveWithStats(t *testing.T) {
+	// The easy board is solved just by calling ParseBoard, needing no search.
+	EnableStats = true
+	Stats.Reset()
+
+	_, err := ParseBoard(easyboard1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if Stats.NumAssigns == 0 {
+		t.Errorf("got NumAssigns==0")
+	}
+	if Stats.NumSearches != 0 {
+		t.Errorf("got NumSearches=%v, want 0", Stats.NumSearches)
+	}
+
+	// For the hard board, we'll find both assigns and searches
+	Stats.Reset()
+
+	_, err = SolveBoard(hardboard1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if Stats.NumAssigns == 0 {
+		t.Errorf("got NumAssigns==0")
+	}
+	if Stats.NumSearches == 0 {
+		t.Errorf("got NumSearches==0")
 	}
 }
 

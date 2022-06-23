@@ -40,23 +40,19 @@ func index(row, col int) Index {
 // digits for this square.
 type Values []Digits
 
-type Sudoku struct {
-	// unitlist is the list of all units that exist on the board.
-	unitlist []Unit
+// unitlist is the list of all units that exist on the board.
+var unitlist []Unit
 
-	// units maps an index to a list of units that contain that square.
-	// The mapping is a slice, i.e. units[i] is a list of all the units
-	// that contain the square with index i.
-	units [][]Unit
+// units maps an index to a list of units that contain that square.
+// The mapping is a slice, i.e. units[i] is a list of all the units
+// that contain the square with index i.
+var units [][]Unit
 
-	// peers maps an index to a list of unique peers - other indices that share
-	// some unit with this index (it won't contain the index itself).
-	peers [][]Index
-}
+// peers maps an index to a list of unique peers - other indices that share
+// some unit with this index (it won't contain the index itself).
+var peers [][]Index
 
-func New() *Sudoku {
-	var unitlist []Unit
-
+func init() {
 	// row units
 	for row := 0; row < 9; row++ {
 		var rowUnit []Index
@@ -90,7 +86,7 @@ func New() *Sudoku {
 	}
 
 	// For each index i, units[i] is a list of all units that contain i.
-	units := make([][]Unit, 81)
+	units = make([][]Unit, 81)
 	for i := 0; i < 81; i++ {
 		for _, unit := range unitlist {
 			if slices.Index(unit, i) >= 0 {
@@ -101,7 +97,7 @@ func New() *Sudoku {
 
 	// For each index i, peers[i] is a list of unique indices that share some
 	// unit with i.
-	peers := make([][]Index, 81)
+	peers = make([][]Index, 81)
 	for i := 0; i < 81; i++ {
 		for _, unit := range units[i] {
 			for _, candidate := range unit {
@@ -113,12 +109,6 @@ func New() *Sudoku {
 				}
 			}
 		}
-	}
-
-	return &Sudoku{
-		unitlist: unitlist,
-		units:    units,
-		peers:    peers,
 	}
 }
 
@@ -132,7 +122,7 @@ func New() *Sudoku {
 // propagation throughout the board.
 // It returns an error if there was an issue parsing the board, of if the board
 // isn't a valid Sudoku board (e.g. contradictions exist).
-func (s *Sudoku) parseBoard(str string) (Values, error) {
+func parseBoard(str string) (Values, error) {
 	var dgs []uint16
 
 	// Iterate and grab only the supported runes; ignore all others.
@@ -154,7 +144,7 @@ func (s *Sudoku) parseBoard(str string) (Values, error) {
 	// Assign square digits based on the parsed board. Note that this runs
 	// constraint propagation and may discover contradictions.
 	for sq, d := range dgs {
-		if d != 0 && !s.assign(values, sq, d) {
+		if d != 0 && !assign(values, sq, d) {
 			return nil, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
 		}
 	}
@@ -166,13 +156,13 @@ func (s *Sudoku) parseBoard(str string) (Values, error) {
 // constraints from the assignment. values is modified.
 // It returns true if the assignment succeeded, and false if the assignment
 // fails resulting in an invalid Sudoku board.
-func (s *Sudoku) assign(values Values, square Index, digit uint16) bool {
+func assign(values Values, square Index, digit uint16) bool {
 	for d := uint16(1); d <= 9; d++ {
 		// For each d 1..9 that's != digit, if d is set in
 		// values[square], try to eliminate it.
 		// TODO: iteration may be inefficient -- is there a beter way?
 		if values[square].isMember(d) && d != digit {
-			if !s.eliminate(values, square, d) {
+			if !eliminate(values, square, d) {
 				return false
 			}
 		}
@@ -184,7 +174,7 @@ func (s *Sudoku) assign(values Values, square Index, digit uint16) bool {
 // constraints. values is modified.
 // It returns false if this results in an invalid Sudoku board; otherwise
 // returns true.
-func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
+func eliminate(values Values, square Index, digit uint16) bool {
 	if !values[square].isMember(digit) {
 		// Already eliminated
 		return true
@@ -201,8 +191,8 @@ func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
 		// A single digit candidate remaining in the square -- this creates a new
 		// constraint. Eliminate this digit from all peer squares.
 		remaining := values[square].singleMemberDigit()
-		for _, peer := range s.peers[square] {
-			if !s.eliminate(values, peer, remaining) {
+		for _, peer := range peers[square] {
+			if !eliminate(values, peer, remaining) {
 				return false
 			}
 		}
@@ -211,7 +201,7 @@ func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
 	// Since digit was eliminated from square, it's possible that we'll find a
 	// position for this digit in one of the units the square belongs to.
 UnitLoop:
-	for _, unit := range s.units[square] {
+	for _, unit := range units[square] {
 		// Looking for a single square in this unit that has 'digit' as one of its
 		// candidates. sqd marks the square, or -1 if no such square was found.
 		sqd := -1
@@ -233,7 +223,7 @@ UnitLoop:
 
 		// There's only a single place left in the unit for 'digit' to go, so
 		// assign it.
-		if !s.assign(values, sqd, digit) {
+		if !assign(values, sqd, digit) {
 			return false
 		}
 	}
@@ -242,7 +232,7 @@ UnitLoop:
 }
 
 // display returns a Sudoku 2D board representation of values
-func (s *Sudoku) display(values Values) string {
+func display(values Values) string {
 	// Find maximum length of one square.
 	var maxlen int = 0
 	for _, d := range values {
@@ -284,8 +274,8 @@ func emptyBoard() Values {
 }
 
 // isSolved checks whether values is a properly solved Sudoku board.
-func (s *Sudoku) isSolved(values Values) bool {
-	for _, unit := range s.unitlist {
+func isSolved(values Values) bool {
+	for _, unit := range unitlist {
 		var dset Digits
 		for _, sq := range unit {
 			// Some squares have more than a single candidate? Not solved.
@@ -304,13 +294,13 @@ func (s *Sudoku) isSolved(values Values) bool {
 
 // solveBoard solves a Sudoku board given in textual representation.
 // It returns an error if there was an issue parsing or solving the board.
-func (s *Sudoku) solveBoard(str string) (Values, error) {
-	values, err := s.parseBoard(str)
+func solveBoard(str string) (Values, error) {
+	values, err := parseBoard(str)
 	if err != nil {
 		return values, err
 	}
 
-	vresult, solved := s.search(values)
+	vresult, solved := search(values)
 	if solved {
 		return vresult, nil
 	} else {
@@ -322,7 +312,7 @@ func (s *Sudoku) solveBoard(str string) (Values, error) {
 // It returns true and the solved values if the search succeeded and we ended up
 // with a board with only a single candidate per square; otherwise, it returns
 // false.
-func (s *Sudoku) search(values Values) (Values, bool) {
+func search(values Values) (Values, bool) {
 	// Find the next square to try assignment in: this would be the square with
 	// more than 1 digit candidate, but the smallest number of such candidates.
 	var squareToTry Index = -1
@@ -346,8 +336,8 @@ func (s *Sudoku) search(values Values) (Values, bool) {
 		// in a successful search() - we've solved the board!
 		if values[squareToTry].isMember(d) {
 			vcopy := slices.Clone(values)
-			if s.assign(vcopy, squareToTry, d) {
-				if vresult, solved := s.search(vcopy); solved {
+			if assign(vcopy, squareToTry, d) {
+				if vresult, solved := search(vcopy); solved {
 					return vresult, true
 				}
 			}

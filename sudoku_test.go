@@ -105,13 +105,23 @@ func TestParseBoard(t *testing.T) {
 func TestSolveBoard(t *testing.T) {
 	s := New()
 	v, err := s.solveBoard(hardboard1)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if !s.isSolved(v) {
 		t.Errorf("expect hard board to be solved by search")
+	}
+
+	// Should work on the easy board also (even though it's solved with the
+	// initial parse)
+	v2, err := s.solveBoard(easyboard1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !s.isSolved(v2) {
+		t.Errorf("expect easy board to be solved by search")
 	}
 }
 
@@ -130,5 +140,12 @@ func BenchmarkParseBoardAssign(b *testing.B) {
 	bn := New()
 	for i := 0; i < b.N; i++ {
 		_, _ = bn.parseBoard(easyboard1)
+	}
+}
+
+func BenchmarkSolveBoard(b *testing.B) {
+	bn := New()
+	for i := 0; i < b.N; i++ {
+		_, _ = bn.solveBoard(hardboard1)
 	}
 }

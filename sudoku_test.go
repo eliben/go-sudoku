@@ -1,7 +1,6 @@
 package sudoku
 
 import (
-	"fmt"
 	"testing"
 
 	"golang.org/x/exp/slices"
@@ -33,12 +32,37 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestParseBoard(t *testing.T) {
+func TestAssignElimination(t *testing.T) {
 	s := New()
-	v, err := s.parseBoard("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
-	fmt.Println(v, err)
+	vals := emptyBoard()
 
-	fmt.Println(s.display(v))
+	// Assign a digit to square 20; check that this digit is the only candidate
+	// in square 20, and that it was eliminated from all the peers of 20.
+	s.assign(vals, 20, 5)
+
+	if vals[20].size() != 1 || vals[20].singleMemberDigit() != 5 {
+		t.Errorf("got vals[20]=%v", vals[20])
+	}
+
+	for sq := 0; sq <= 80; sq++ {
+		if slices.Contains(s.peers[20], sq) {
+			if vals[sq].isMember(5) {
+				t.Errorf("got member 5 in peer square %v", sq)
+			}
+		} else {
+			if !vals[sq].isMember(5) {
+				t.Errorf("got no member 5 in non-peer square %v", sq)
+			}
+		}
+	}
+}
+
+func TestParseBoard(t *testing.T) {
+	//s := New()
+	//v, err := s.parseBoard("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
+	//fmt.Println(v, err)
+
+	//fmt.Println(s.display(v))
 }
 
 func BenchmarkSudokuNew(b *testing.B) {

@@ -38,7 +38,7 @@ func index(row, col int) Index {
 // An element at index [i] in Values represents Sudoku square i (see the
 // documentation of the Index type), and contains a set of all candidate
 // digits for this square.
-type Values [81]Digits
+type Values []Digits
 
 type Sudoku struct {
 	// unitlist is the list of all units that exist on the board.
@@ -172,7 +172,7 @@ func (s *Sudoku) assign(values Values, square Index, digit uint16) bool {
 		// values[square] try to eliminate it.
 		// TODO: iteration may be inefficient -- is there a beter way?
 		if values[square].isMember(d) && d != digit {
-			if !s.eliminate(values, square, digit) {
+			if !s.eliminate(values, square, d) {
 				return false
 			}
 		}
@@ -200,7 +200,7 @@ func (s *Sudoku) eliminate(values Values, square Index, digit uint16) bool {
 	case 1:
 		// A single digit candidate remaining in the square -- this creates a new
 		// constraint. Eliminate this digit from all peer squares.
-		remaining := values[square].singleMemberOffset()
+		remaining := values[square].singleMemberDigit()
 		for _, peer := range s.peers[square] {
 			if !s.eliminate(values, peer, remaining) {
 				return false
@@ -269,7 +269,7 @@ func (s *Sudoku) display(values Values) string {
 // emptyBoard creates an "empty" Sudoku board, where each square can potentially
 // contain any digit.
 func emptyBoard() Values {
-	var vals Values
+	vals := make(Values, 81)
 	for sq := range vals {
 		vals[sq] = fullDigitsSet()
 	}

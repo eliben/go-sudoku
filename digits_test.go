@@ -94,9 +94,9 @@ func TestAddRemoveAllSize(t *testing.T) {
 				t.Errorf("got size=%v, want 1", d.size())
 			}
 
-			off := d.singleMemberOffset()
+			off := d.singleMemberDigit()
 			if off != dig {
-				t.Errorf("got singleMemberOffset=%v, want %v", off, dig)
+				t.Errorf("got singleMemberDigit=%v, want %v", off, dig)
 			}
 
 			// For each 'dig2', check set membership

@@ -42,9 +42,9 @@ func (d Digits) size() int {
 	return bits.OnesCount16(uint16(d))
 }
 
-// singleOnOffset returns the digit that's a member of a 1-element set; this
+// singleMemberDigit returns the digit that's a member of a 1-element set; this
 // assumes that the set indeed has a single element.
-func (d Digits) singleMemberOffset() uint16 {
+func (d Digits) singleMemberDigit() uint16 {
 	return uint16(bits.TrailingZeros16(uint16(d)))
 }
 

@@ -122,16 +122,17 @@ func New() *Sudoku {
 	}
 }
 
-// parseGrid parses a Sudoku grid in a simplified representation, and returns
+// parseBoard parses a Sudoku board in a simplified representation, and returns
 // it as Values. The simplified representation is as described in
 // http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the
 // set [0123456789.], where 0 or . mean "unassigned". All other runes in the
 // string are ignored.
-// This function will assign grid digits to an initial Values, so it may perform
-// some constraint propagation on the grid if it's easily solvable.
-// It returns an error if there was an issue parsing the grid, of if the grid
-// isn't a valid Sudoku grid (e.g. contradictions exist).
-func (s *Sudoku) parseGrid(str string) (Values, error) {
+// This function tries to end up with a valid board, so it will call `assign`
+// to assign digits specified in the inpput; this may invoke some constraint
+// propagation throughout the board.
+// It returns an error if there was an issue parsing the board, of if the board
+// isn't a valid Sudoku board (e.g. contradictions exist).
+func (s *Sudoku) parseBoard(str string) (Values, error) {
 	var dgs []uint16
 
 	// Iterate and grab only the supported runes; ignore all others.
@@ -143,10 +144,8 @@ func (s *Sudoku) parseGrid(str string) (Values, error) {
 		}
 	}
 
-	//fmt.Println(dgs)
-
 	if len(dgs) != 81 {
-		return nil, fmt.Errorf("got only %v digits in grid, want 81", len(dgs))
+		return nil, fmt.Errorf("got only %v digits in board, want 81", len(dgs))
 	}
 
 	// Start by creating a nominal Values with all candidates set for all squares.
@@ -156,7 +155,7 @@ func (s *Sudoku) parseGrid(str string) (Values, error) {
 		values[sq] = fullDigitsSet()
 	}
 
-	// Assign square digits based on the parsed grid. Note that this runs
+	// Assign square digits based on the parsed board. Note that this runs
 	// constraint propagation and may discover contradictions.
 	for sq, d := range dgs {
 		if d != 0 && !s.assign(values, sq, d) {

@@ -61,11 +61,14 @@ func TestAssignElimination(t *testing.T) {
 	}
 }
 
+// Easy board from Norvig's example that's solved by constraint propagation
+// w/o any search.
+var easyboard1 string = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
+var hardboard1 string = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+
 func TestParseBoard(t *testing.T) {
 	s := New()
-	// Easy board from Norvig's example that's solved by constraint propagation
-	// w/o any search.
-	v, err := s.parseBoard("003020600900305001001806400008102900700000008006708200002609500800203009005010300")
+	v, err := s.parseBoard(easyboard1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +78,7 @@ func TestParseBoard(t *testing.T) {
 	}
 
 	// Harder board that isn't fully solved without search.
-	v2, err := s.parseBoard("4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......")
+	v2, err := s.parseBoard(hardboard1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,8 +102,19 @@ func TestParseBoard(t *testing.T) {
 }
 
 func BenchmarkSudokuNew(b *testing.B) {
+	// Benchmarking initialization.
 	for i := 0; i < b.N; i++ {
 		bn := New()
 		_ = bn
+	}
+}
+
+func BenchmarkParseBoardAssign(b *testing.B) {
+	// Benchmark how long it takes to parse a board and run full constraint
+	// propagation. We know that for easyboard1 it's fully solved with
+	// constraint propagation after parsing.
+	bn := New()
+	for i := 0; i < b.N; i++ {
+		_, _ = bn.parseBoard(easyboard1)
 	}
 }

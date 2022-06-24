@@ -44,11 +44,12 @@ func main() {
 		numBoards++
 
 		tStart := time.Now()
-		v, err := sudoku.SolveBoard(board)
-		tElapsed := time.Now().Sub(tStart)
+		v, err := sudoku.ParseBoard(board)
+		v, _ = sudoku.Solve(v)
 		if err != nil {
 			log.Fatal(err)
 		}
+		tElapsed := time.Now().Sub(tStart)
 
 		totalDuration += tElapsed
 		if tElapsed > maxDuration {

@@ -294,29 +294,16 @@ func IsSolved(values Values) bool {
 	return true
 }
 
-// SolveBoard solves a Sudoku board given in textual representation.
-// It returns an error if there was an issue parsing the board. The returned
-// values may not have a unique assignment per square if the board was not
-// solvable.
-func SolveBoard(str string) (Values, error) {
-	values, err := ParseBoard(str)
-	if err != nil {
-		return values, err
-	}
-
-	vresult, _ := search(values)
-	return vresult, nil
-}
-
-// search runs a backtracking search to solve the board given in values.
+// Solve runs a backtracking search to solve the board given in values.
 // It returns true and the solved values if the search succeeded and we ended up
 // with a board with only a single candidate per square; otherwise, it returns
 // false.
-func search(values Values) (Values, bool) {
+func Solve(values Values) (Values, bool) {
 	if EnableStats {
 		Stats.NumSearches++
 	}
 
+	// TODO: can this be optimized?
 	// Find the next square to try assignment in: this would be the square with
 	// more than 1 digit candidate, but the smallest number of such candidates.
 	var squareToTry Index = -1
@@ -336,11 +323,11 @@ func search(values Values) (Values, bool) {
 
 	for d := uint16(1); d <= 9; d++ {
 		// Try to assign sq with each one of its candidate digits. If this results
-		// in a successful search() - we've solved the board!
+		// in a successful Solve() - we've solved the board!
 		if values[squareToTry].isMember(d) {
 			vcopy := slices.Clone(values)
 			if assign(vcopy, squareToTry, d) {
-				if vresult, solved := search(vcopy); solved {
+				if vresult, solved := Solve(vcopy); solved {
 					return vresult, true
 				}
 			}

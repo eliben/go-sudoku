@@ -118,33 +118,36 @@ func TestParseBoard(t *testing.T) {
 }
 
 func TestSolveBoard(t *testing.T) {
-	v, err := SolveBoard(hardboard1)
+	v, err := ParseBoard(hardboard1)
 	if err != nil {
 		log.Fatal(err)
 	}
+	v, success := Solve(v)
 
-	if !IsSolved(v) {
+	if !success || !IsSolved(v) {
 		t.Errorf("expect hardboard1 to be solved by search")
 	}
 
 	// Should work on the easy board also (even though it's solved with the
 	// initial parse)
-	v2, err := SolveBoard(easyboard1)
+	v2, err := ParseBoard(easyboard1)
 	if err != nil {
 		log.Fatal(err)
 	}
+	v2, success2 := Solve(v2)
 
-	if !IsSolved(v2) {
+	if !success2 || !IsSolved(v2) {
 		t.Errorf("expect easy board to be solved by search")
 	}
 
 	// And the other hard board
-	v3, err := SolveBoard(hardboard2)
+	v3, err := ParseBoard(hardboard2)
 	if err != nil {
 		log.Fatal(err)
 	}
+	v3, success3 := Solve(v3)
 
-	if !IsSolved(v3) {
+	if !success3 || !IsSolved(v3) {
 		t.Errorf("expect hardboard2 to be solved by search")
 	}
 }
@@ -167,10 +170,11 @@ func TestSolveWithStats(t *testing.T) {
 		// For the hard board, we'll find both assigns and searches
 		Stats.Reset()
 
-		_, err = SolveBoard(hardboard1)
+		v, err := ParseBoard(hardboard1)
 		if err != nil {
 			t.Fatal(err)
 		}
+		_, _ = Solve(v)
 
 		if Stats.NumAssigns == 0 {
 			t.Errorf("got NumAssigns==0")
@@ -225,12 +229,13 @@ func TestImpossible(t *testing.T) {
 	}
 
 	WithStats(func() {
-		v, err := SolveBoard(impossible)
+		v, err := ParseBoard(impossible)
 		if err != nil {
 			log.Fatal(err)
 		}
+		v, success := Solve(v)
 
-		if IsSolved(v) {
+		if success || IsSolved(v) {
 			t.Errorf("got solved board for impossible")
 		}
 		fmt.Printf("searches=%v, assigns=%v\n", Stats.NumSearches, Stats.NumAssigns)
@@ -256,12 +261,13 @@ func TestSolveHardest(t *testing.T) {
 	for _, board := range strings.Split(hardest, "\n") {
 		board = strings.TrimSpace(board)
 		if len(board) > 0 {
-			v, err := SolveBoard(board)
+			v, err := ParseBoard(board)
 			if err != nil {
 				log.Fatalf("error for board %v: %v", board, err)
 			}
+			v, success := Solve(v)
 
-			if !IsSolved(v) {
+			if !success || !IsSolved(v) {
 				t.Errorf("not solved board %v", board)
 			}
 		}
@@ -270,9 +276,9 @@ func TestSolveHardest(t *testing.T) {
 
 func TestSolveEmpty(t *testing.T) {
 	vals := EmptyBoard()
-	vres, solved := search(vals)
+	vres, solved := Solve(vals)
 	if !solved {
-		t.Errorf("want search(empty) to report success")
+		t.Errorf("want Solve(empty) to report success")
 	}
 
 	if !IsSolved(vres) {
@@ -291,9 +297,13 @@ func BenchmarkParseBoardAssign(b *testing.B) {
 
 func BenchmarkSolveBoardHardlong(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		v, err := SolveBoard(hardlong)
-		if err != nil || !IsSolved(v) {
-			panic("not solved")
+		v, err := ParseBoard(hardlong)
+		if err != nil {
+			log.Fatal(err)
+		}
+		v, success := Solve(v)
+		if !success {
+			log.Fatal("not solved")
 		}
 	}
 }
@@ -302,6 +312,6 @@ func BenchmarkSolveEmpty(b *testing.B) {
 	// Benchmark how long it takes to "solve" an empty board.
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
-		_, _ = search(empty)
+		_, _ = Solve(empty)
 	}
 }

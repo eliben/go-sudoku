@@ -70,7 +70,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Solved %v boards out of %v\n", numSolved, numBoards)
+	fmt.Printf("Solved %v/%v boards\n", numSolved, numBoards)
 	fmt.Println("Average duration:", totalDuration/time.Duration(numBoards))
 	fmt.Println("Max duration:", maxDuration)
 	if *statsFlag {

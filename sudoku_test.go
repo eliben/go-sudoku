@@ -71,7 +71,10 @@ var easyboard1 string = "0030206009003050010018064000081029007000000080067082000
 var hardboard1 string = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
 var hardboard2 string = "..53.....8......2..7..1.5..4....53...1..7...6..32...8..6.5....9..4....3......97.."
 
-// This is the longest Norvig's program took to solve a puzzle
+// This is the sudoku board Norvig reported takes the longest for his program
+// to solve. Note that this board has multiple solutions.
+// TODO: write "long" test that explores solutions using N randomized runs,
+// and reports run-times?
 var hardlong string = `
 . . . |. . 6 |. . .
 . 5 9 |. . . |. . 8
@@ -366,7 +369,6 @@ func BenchmarkParseBoardAssign(b *testing.B) {
 }
 
 func BenchmarkSolveBoardHardlong(b *testing.B) {
-	//rand.Seed(time.Now().UnixNano())
 	for i := 0; i < b.N; i++ {
 		v, err := ParseBoard(hardlong)
 		if err != nil {

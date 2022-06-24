@@ -333,7 +333,6 @@ func TestSolveHardest(t *testing.T) {
 	}
 }
 
-// TODO: find different solutions with Randomize
 func TestSolveEmpty(t *testing.T) {
 	vals := EmptyBoard()
 	vres, solved := Solve(vals, SolveOptions{})
@@ -343,6 +342,17 @@ func TestSolveEmpty(t *testing.T) {
 
 	if !IsSolved(vres) {
 		t.Errorf("want solved result board; got:\n%v", Display(vres))
+	}
+
+	// Try a few randomized solutions
+	for i := 0; i < 10; i++ {
+		vs, solved := Solve(vals, SolveOptions{Randomize: true})
+		if !solved {
+			t.Errorf("want Solve(empty) to report success")
+		}
+		if !IsSolved(vs) {
+			t.Errorf("want solved result board; got:\n%v", Display(vs))
+		}
 	}
 }
 
@@ -385,6 +395,16 @@ func BenchmarkSolveBoardHardlongRandomized(b *testing.B) {
 
 func BenchmarkSolveEmpty(b *testing.B) {
 	// Benchmark how long it takes to "solve" an empty board.
+	empty := EmptyBoard()
+	for i := 0; i < b.N; i++ {
+		_, _ = Solve(empty, SolveOptions{})
+	}
+}
+
+func BenchmarkSolveEmptyRandomized(b *testing.B) {
+	// Benchmark how long it takes to "solve" an empty board,
+	// with randomization. Each solution will be different.
+	rand.Seed(time.Now().UnixNano())
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
 		_, _ = Solve(empty, SolveOptions{})

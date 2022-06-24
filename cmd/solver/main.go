@@ -26,6 +26,7 @@ func main() {
 	var totalDuration time.Duration = 0
 	var maxDuration time.Duration = 0
 	var totalSearches uint64 = 0
+	var maxSearches uint64 = 0
 	var numBoards int = 0
 	var numSolved int = 0
 
@@ -62,6 +63,9 @@ func main() {
 
 		if *statsFlag {
 			totalSearches += sudoku.Stats.NumSearches
+			if sudoku.Stats.NumSearches > maxSearches {
+				maxSearches = sudoku.Stats.NumSearches
+			}
 			sudoku.Stats.Reset()
 		}
 	}
@@ -71,9 +75,8 @@ func main() {
 	}
 
 	fmt.Printf("Solved %v/%v boards\n", numSolved, numBoards)
-	fmt.Println("Average duration:", totalDuration/time.Duration(numBoards))
-	fmt.Println("Max duration:", maxDuration)
+	fmt.Printf("Duration average=%-15v max=%v\n", totalDuration/time.Duration(numBoards), maxDuration)
 	if *statsFlag {
-		fmt.Printf("Average searches: %.2f per board\n", float64(totalSearches)/float64(numBoards))
+		fmt.Printf("Searches average=%-15.2f max=%v\n", float64(totalSearches)/float64(numBoards), maxSearches)
 	}
 }

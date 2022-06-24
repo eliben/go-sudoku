@@ -1,0 +1,3 @@
+# The hardest board Norvig generated in a million random puzzles. Note: it has
+# more than one solution.
+.....6....59.....82....8....45........3........6..3.54...325..6..................

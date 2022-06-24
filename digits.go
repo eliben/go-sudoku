@@ -43,11 +43,6 @@ func (d Digits) removeAll(dn Digits) Digits {
 	return d &^ dn
 }
 
-// intersection computes the set intersection between d and dn.
-func (d Digits) intersection(dn Digits) Digits {
-	return d & dn
-}
-
 // size returns the size of the set - the number of digits in it.
 func (d Digits) size() int {
 	return bits.OnesCount16(uint16(d))

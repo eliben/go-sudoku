@@ -62,24 +62,6 @@ func TestAssignElimination(t *testing.T) {
 	}
 }
 
-func TestNakedTwins(t *testing.T) {
-	// Test the naked twins strategy on an artificial board.
-	values := EmptyBoard()
-
-	var d4and9 Digits
-	d4and9 = d4and9.add(4).add(9)
-	// Set squares 30 and 32 to have the same two candidates; naketTwins should
-	// propagate this constraint to the row unit both squares are in and to the
-	// 3x3 block unit they're both in.
-	values[30] = d4and9
-	values[32] = d4and9
-
-	nakedTwins(values)
-
-	//fmt.Println(Display(values))
-	// TODO: write the test
-}
-
 // Easy board from Norvig's example that's solved by constraint propagation
 // w/o any search.
 var easyboard1 string = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
@@ -140,7 +122,6 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Println(Stats.NumSearches, Stats.NumAssigns)
 
 	if !IsSolved(v) {
 		t.Errorf("expect hardboard1 to be solved by search")
@@ -200,14 +181,6 @@ func TestSolveWithStats(t *testing.T) {
 	})
 }
 
-func TestDebugTwin(t *testing.T) {
-	v, err := ParseBoard("7..1523........92....3.....1....47.8.......6............9...5.6.4.9.7...8....6.1.")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(v)
-}
-
 func TestIsSolved(t *testing.T) {
 	v, err := ParseBoard(easyboard1)
 	if err != nil {
@@ -251,7 +224,6 @@ func TestImpossible(t *testing.T) {
 		t.Skip("skipping test in short mode.")
 	}
 
-	// TODO: use WithStats wherever needed
 	WithStats(func() {
 		v, err := SolveBoard(impossible)
 		if err != nil {

@@ -160,5 +160,3 @@ func TestFullDigitsSet(t *testing.T) {
 		t.Errorf("got %v, want all digits", d.String())
 	}
 }
-
-// TODO: add tests for intersection, or remove it

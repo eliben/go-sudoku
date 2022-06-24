@@ -230,49 +230,6 @@ UnitLoop:
 		}
 	}
 
-	//fmt.Println("-------------")
-	//fmt.Println("Before nakedTwins:")
-	//fmt.Println(Display(values))
-	//b := nakedTwins(values)
-	//fmt.Println("After nakedTwins:")
-	//fmt.Println(Display(values))
-	//return b
-
-	return true
-}
-
-func nakedTwins(values Values) bool {
-	for _, unit := range unitlist {
-		// dcount will map Digits->count, counting how many times a certain
-		// combination of digit candidates appears in this unit.
-		dcount := make(map[Digits]int)
-		for _, sq := range unit {
-			dcount[values[sq]]++
-		}
-
-		// Find a combination that has exactly two digits and appears exactly
-		// twice in the unit -- this is a naked twin.
-		for d, count := range dcount {
-			if d.size() == 2 && count == 2 {
-				//fmt.Printf("found candidates '%s' with count 2\n", d)
-				// Found it! Now go over all the squares in this unit other than the
-				// ones with these exact two candidates, and eliminate both candidates
-				// from them.
-				d1, d2 := d.twoMemberDigits()
-				for _, sq := range unit {
-					if values[sq].size() > 3 && values[sq] != d {
-						if !eliminate(values, sq, d1) {
-							return false
-						}
-						if !eliminate(values, sq, d2) {
-							return false
-						}
-					}
-				}
-				return true
-			}
-		}
-	}
 	return true
 }
 

@@ -275,7 +275,8 @@ func EmptyBoard() Values {
 	return vals
 }
 
-// IsSolved checks whether values is a properly solved Sudoku board.
+// IsSolved checks whether values is a properly solved Sudoku board, with all
+// the constraints satisfied.
 func IsSolved(values Values) bool {
 	for _, unit := range unitlist {
 		var dset Digits
@@ -294,6 +295,20 @@ func IsSolved(values Values) bool {
 	return true
 }
 
+// findSquareWithFewestCandidates finds a square in values with more than one
+// digit candidate, but the smallest number of such candidates.
+func findSquareWithFewestCandidates(values Values) Index {
+	var squareToTry Index = -1
+	var minSize int = 10
+	for sq, d := range values {
+		if d.size() > 1 && d.size() < minSize {
+			minSize = d.size()
+			squareToTry = sq
+		}
+	}
+	return squareToTry
+}
+
 // Solve runs a backtracking search to solve the board given in values.
 // It returns true and the solved values if the search succeeded and we ended up
 // with a board with only a single candidate per square; otherwise, it returns
@@ -303,17 +318,7 @@ func Solve(values Values) (Values, bool) {
 		Stats.NumSearches++
 	}
 
-	// TODO: can this be optimized?
-	// Find the next square to try assignment in: this would be the square with
-	// more than 1 digit candidate, but the smallest number of such candidates.
-	var squareToTry Index = -1
-	var minSize int = 10
-	for sq, d := range values {
-		if d.size() > 1 && d.size() < minSize {
-			minSize = d.size()
-			squareToTry = sq
-		}
-	}
+	squareToTry := findSquareWithFewestCandidates(values)
 
 	// If we didn't find any square with more than one candidate, the board is
 	// solved!

@@ -16,13 +16,6 @@ func main() {
 	statsFlag := flag.Bool("stats", false, "enable stats for solving")
 	flag.Parse()
 
-	filename := flag.Args()[0]
-
-	f, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	var totalDuration time.Duration = 0
 	var maxDuration time.Duration = 0
 	var totalSearches uint64 = 0
@@ -35,7 +28,7 @@ func main() {
 	}
 
 	// Expect one board per line, ignoring whitespace and lines starting with '#'.
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		board := strings.TrimSpace(scanner.Text())
 		if len(board) == 0 || strings.HasPrefix(board, "#") {

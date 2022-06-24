@@ -230,15 +230,15 @@ UnitLoop:
 		}
 	}
 
-	fmt.Println("-------------")
-	fmt.Println("Before nakedTwins:")
-	fmt.Println(Display(values))
-	b := nakedTwins(values)
-	fmt.Println("After nakedTwins:")
-	fmt.Println(Display(values))
-	return b
+	//fmt.Println("-------------")
+	//fmt.Println("Before nakedTwins:")
+	//fmt.Println(Display(values))
+	//b := nakedTwins(values)
+	//fmt.Println("After nakedTwins:")
+	//fmt.Println(Display(values))
+	//return b
 
-	//return true
+	return true
 }
 
 func nakedTwins(values Values) bool {
@@ -254,13 +254,13 @@ func nakedTwins(values Values) bool {
 		// twice in the unit -- this is a naked twin.
 		for d, count := range dcount {
 			if d.size() == 2 && count == 2 {
-				fmt.Printf("found candidates '%s' with count 2\n", d)
+				//fmt.Printf("found candidates '%s' with count 2\n", d)
 				// Found it! Now go over all the squares in this unit other than the
 				// ones with these exact two candidates, and eliminate both candidates
 				// from them.
 				d1, d2 := d.twoMemberDigits()
 				for _, sq := range unit {
-					if values[sq] != d {
+					if values[sq].size() > 3 && values[sq] != d {
 						if !eliminate(values, sq, d1) {
 							return false
 						}

@@ -2,6 +2,7 @@ package sudoku
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -309,11 +310,24 @@ func findSquareWithFewestCandidates(values Values) Index {
 	return squareToTry
 }
 
+// SolveOptions is a container of options that can be taken by the
+// Solve function.
+type SolveOptions struct {
+	// Randomize tells the solver to randomly shuffle its digit selection when
+	// attempting to guess a value for a square. For actual randomness, the
+	// rand package's default randomness source should be properly seeded before
+	// invoking Solve.
+	Randomize bool
+}
+
 // Solve runs a backtracking search to solve the board given in values.
 // It returns true and the solved values if the search succeeded and we ended up
 // with a board with only a single candidate per square; otherwise, it returns
-// false.
-func Solve(values Values) (Values, bool) {
+// false. The input values is not modified.
+// The solution process can be configured by providing SolveOptions.
+// Consider making SolveOptions ... so they're not mandatory, but panic if more
+// than 1.
+func Solve(values Values, options SolveOptions) (Values, bool) {
 	if EnableStats {
 		Stats.NumSearches++
 	}
@@ -326,13 +340,20 @@ func Solve(values Values) (Values, bool) {
 		return values, true
 	}
 
-	for d := uint16(1); d <= 9; d++ {
+	var candidates = []uint16{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	if options.Randomize {
+		rand.Shuffle(len(candidates), func(i, j int) {
+			candidates[i], candidates[j] = candidates[j], candidates[i]
+		})
+	}
+
+	for _, d := range candidates {
 		// Try to assign sq with each one of its candidate digits. If this results
 		// in a successful Solve() - we've solved the board!
 		if values[squareToTry].isMember(d) {
 			vcopy := slices.Clone(values)
 			if assign(vcopy, squareToTry, d) {
-				if vresult, solved := Solve(vcopy); solved {
+				if vresult, solved := Solve(vcopy, options); solved {
 					return vresult, true
 				}
 			}

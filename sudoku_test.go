@@ -3,8 +3,10 @@ package sudoku
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"testing"
+	"time"
 
 	"golang.org/x/exp/slices"
 )
@@ -122,9 +124,13 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v, success := Solve(v)
+	vcopy := slices.Clone(v)
+	vs, success := Solve(v, SolveOptions{})
+	if !slices.Equal(v, vcopy) {
+		t.Errorf("Solve modified board; before=%v, after=%v", vcopy, v)
+	}
 
-	if !success || !IsSolved(v) {
+	if !success || !IsSolved(vs) {
 		t.Errorf("expect hardboard1 to be solved by search")
 	}
 
@@ -134,7 +140,7 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v2, success2 := Solve(v2)
+	v2, success2 := Solve(v2, SolveOptions{})
 
 	if !success2 || !IsSolved(v2) {
 		t.Errorf("expect easy board to be solved by search")
@@ -145,7 +151,7 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v3, success3 := Solve(v3)
+	v3, success3 := Solve(v3, SolveOptions{})
 
 	if !success3 || !IsSolved(v3) {
 		t.Errorf("expect hardboard2 to be solved by search")
@@ -174,7 +180,7 @@ func TestSolveWithStats(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, _ = Solve(v)
+		_, _ = Solve(v, SolveOptions{})
 
 		if Stats.NumAssigns == 0 {
 			t.Errorf("got NumAssigns==0")
@@ -281,7 +287,7 @@ func TestImpossible(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		v, success := Solve(v)
+		v, success := Solve(v, SolveOptions{})
 
 		if success || IsSolved(v) {
 			t.Errorf("got solved board for impossible")
@@ -313,18 +319,24 @@ func TestSolveHardest(t *testing.T) {
 			if err != nil {
 				log.Fatalf("error for board %v: %v", board, err)
 			}
-			v, success := Solve(v)
-
-			if !success || !IsSolved(v) {
+			vs, success := Solve(v, SolveOptions{})
+			if !success || !IsSolved(vs) {
 				t.Errorf("not solved board %v", board)
+			}
+
+			// Now solve again, with randomization
+			vsr, success := Solve(v, SolveOptions{Randomize: true})
+			if !success || !IsSolved(vsr) {
+				t.Errorf("not solved randomized board %v", board)
 			}
 		}
 	}
 }
 
+// TODO: find different solutions with Randomize
 func TestSolveEmpty(t *testing.T) {
 	vals := EmptyBoard()
-	vres, solved := Solve(vals)
+	vres, solved := Solve(vals, SolveOptions{})
 	if !solved {
 		t.Errorf("want Solve(empty) to report success")
 	}
@@ -344,12 +356,27 @@ func BenchmarkParseBoardAssign(b *testing.B) {
 }
 
 func BenchmarkSolveBoardHardlong(b *testing.B) {
+	//rand.Seed(time.Now().UnixNano())
 	for i := 0; i < b.N; i++ {
 		v, err := ParseBoard(hardlong)
 		if err != nil {
 			log.Fatal(err)
 		}
-		v, success := Solve(v)
+		v, success := Solve(v, SolveOptions{})
+		if !success {
+			log.Fatal("not solved")
+		}
+	}
+}
+
+func BenchmarkSolveBoardHardlongRandomized(b *testing.B) {
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < b.N; i++ {
+		v, err := ParseBoard(hardlong)
+		if err != nil {
+			log.Fatal(err)
+		}
+		v, success := Solve(v, SolveOptions{Randomize: true})
 		if !success {
 			log.Fatal("not solved")
 		}
@@ -360,6 +387,6 @@ func BenchmarkSolveEmpty(b *testing.B) {
 	// Benchmark how long it takes to "solve" an empty board.
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
-		_, _ = Solve(empty)
+		_, _ = Solve(empty, SolveOptions{})
 	}
 }

@@ -45,7 +45,7 @@ func main() {
 
 		tStart := time.Now()
 		v, err := sudoku.ParseBoard(board)
-		v, _ = sudoku.Solve(v)
+		v, _ = sudoku.Solve(v, sudoku.SolveOptions{})
 		if err != nil {
 			log.Fatal(err)
 		}

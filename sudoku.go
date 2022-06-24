@@ -320,7 +320,7 @@ func search(values Values) (Values, bool) {
 	// Find the next square to try assignment in: this would be the square with
 	// more than 1 digit candidate, but the smallest number of such candidates.
 	var squareToTry Index = -1
-	var minSize int = 9
+	var minSize int = 10
 	for sq, d := range values {
 		if d.size() > 1 && d.size() < minSize {
 			minSize = d.size()

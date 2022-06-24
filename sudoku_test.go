@@ -268,12 +268,24 @@ func TestSolveHardest(t *testing.T) {
 	}
 }
 
+func TestSolveEmpty(t *testing.T) {
+	vals := EmptyBoard()
+	vres, solved := search(vals)
+	if !solved {
+		t.Errorf("want search(empty) to report success")
+	}
+
+	if !IsSolved(vres) {
+		t.Errorf("want solved result board; got:\n%v", Display(vres))
+	}
+}
+
 func BenchmarkParseBoardAssign(b *testing.B) {
 	// Benchmark how long it takes to parse a board and run full constraint
 	// propagation. We know that for easyboard1 it's fully solved with
 	// constraint propagation after parsing.
 	for i := 0; i < b.N; i++ {
-		_, _ = SolveBoard(hardboard2)
+		_, _ = ParseBoard(easyboard1)
 	}
 }
 
@@ -283,5 +295,13 @@ func BenchmarkSolveBoardHardlong(b *testing.B) {
 		if err != nil || !IsSolved(v) {
 			panic("not solved")
 		}
+	}
+}
+
+func BenchmarkSolveEmpty(b *testing.B) {
+	// Benchmark how long it takes to "solve" an empty board.
+	empty := EmptyBoard()
+	for i := 0; i < b.N; i++ {
+		_, _ = search(empty)
 	}
 }

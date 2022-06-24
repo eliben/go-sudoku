@@ -37,6 +37,17 @@ func (d Digits) remove(n uint16) Digits {
 	return d &^ (1 << n)
 }
 
+// removeAll removes all digits represented by dn from d and returns
+// the new set.
+func (d Digits) removeAll(dn Digits) Digits {
+	return d &^ dn
+}
+
+// intersection computes the set intersection between d and dn.
+func (d Digits) intersection(dn Digits) Digits {
+	return d & dn
+}
+
 // size returns the size of the set - the number of digits in it.
 func (d Digits) size() int {
 	return bits.OnesCount16(uint16(d))
@@ -46,6 +57,14 @@ func (d Digits) size() int {
 // assumes that the set indeed has a single element.
 func (d Digits) singleMemberDigit() uint16 {
 	return uint16(bits.TrailingZeros16(uint16(d)))
+}
+
+// twoMemberDigits returns the only two digits that are member of a 2-element
+// set; this assumes that the set indeed has two elements.
+func (d Digits) twoMemberDigits() (uint16, uint16) {
+	d1 := uint16(bits.TrailingZeros16(uint16(d)))
+	d2 := 16 - uint16(bits.LeadingZeros16(uint16(d))) - 1
+	return d1, d2
 }
 
 // String implements the fmt.Stringer interface for Digits.

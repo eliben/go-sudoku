@@ -1,6 +1,7 @@
 package sudoku
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -59,6 +60,24 @@ func TestAssignElimination(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestNakedTwins(t *testing.T) {
+	// Test the naked twins strategy on an artificial board.
+	values := EmptyBoard()
+
+	var d4and9 Digits
+	d4and9 = d4and9.add(4).add(9)
+	// Set squares 30 and 32 to have the same two candidates; naketTwins should
+	// propagate this constraint to the row unit both squares are in and to the
+	// 3x3 block unit they're both in.
+	values[30] = d4and9
+	values[32] = d4and9
+
+	nakedTwins(values)
+
+	//fmt.Println(Display(values))
+	// TODO: write the test
 }
 
 // Easy board from Norvig's example that's solved by constraint propagation
@@ -151,35 +170,42 @@ func TestSolveBoard(t *testing.T) {
 
 func TestSolveWithStats(t *testing.T) {
 	// The easy board is solved just by calling ParseBoard, needing no search.
-	EnableStats = true
-	Stats.Reset()
+	WithStats(func() {
+		_, err := ParseBoard(easyboard1)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	_, err := ParseBoard(easyboard1)
+		if Stats.NumAssigns == 0 {
+			t.Errorf("got NumAssigns==0")
+		}
+		if Stats.NumSearches != 0 {
+			t.Errorf("got NumSearches=%v, want 0", Stats.NumSearches)
+		}
+
+		// For the hard board, we'll find both assigns and searches
+		Stats.Reset()
+
+		_, err = SolveBoard(hardboard1)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if Stats.NumAssigns == 0 {
+			t.Errorf("got NumAssigns==0")
+		}
+		if Stats.NumSearches == 0 {
+			t.Errorf("got NumSearches==0")
+		}
+	})
+}
+
+func TestDebugTwin(t *testing.T) {
+	v, err := ParseBoard("7..1523........92....3.....1....47.8.......6............9...5.6.4.9.7...8....6.1.")
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
-
-	if Stats.NumAssigns == 0 {
-		t.Errorf("got NumAssigns==0")
-	}
-	if Stats.NumSearches != 0 {
-		t.Errorf("got NumSearches=%v, want 0", Stats.NumSearches)
-	}
-
-	// For the hard board, we'll find both assigns and searches
-	Stats.Reset()
-
-	_, err = SolveBoard(hardboard1)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if Stats.NumAssigns == 0 {
-		t.Errorf("got NumAssigns==0")
-	}
-	if Stats.NumSearches == 0 {
-		t.Errorf("got NumSearches==0")
-	}
+	fmt.Println(v)
 }
 
 func TestIsSolved(t *testing.T) {
@@ -224,14 +250,19 @@ func TestImpossible(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
-	v, err := SolveBoard(impossible)
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	if IsSolved(v) {
-		t.Errorf("got solved board for impossible")
-	}
+	// TODO: use WithStats wherever needed
+	WithStats(func() {
+		v, err := SolveBoard(impossible)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if IsSolved(v) {
+			t.Errorf("got solved board for impossible")
+		}
+		fmt.Printf("searches=%v, assigns=%v\n", Stats.NumSearches, Stats.NumAssigns)
+	})
 }
 
 func TestSolveHardest(t *testing.T) {
@@ -255,7 +286,7 @@ func TestSolveHardest(t *testing.T) {
 		if len(board) > 0 {
 			v, err := SolveBoard(board)
 			if err != nil {
-				log.Fatal(err)
+				log.Fatalf("error for board %v: %v", board, err)
 			}
 
 			if !IsSolved(v) {

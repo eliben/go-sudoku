@@ -64,6 +64,22 @@ func TestRemove(t *testing.T) {
 	}
 }
 
+func TestRemoveAll(t *testing.T) {
+	d := Digits(0b0011100110)
+
+	got1 := d.removeAll(0b0011000000)
+	want1 := Digits(0b0000100110)
+	if got1 != want1 {
+		t.Errorf("got %v, want %v", got1, want1)
+	}
+
+	got2 := d.removeAll(0b0001000110)
+	want2 := Digits(0b0010100000)
+	if got2 != want2 {
+		t.Errorf("got %v, want %v", got2, want2)
+	}
+}
+
 func TestAddRemoveAllSize(t *testing.T) {
 	// Exhaustive testing that adds/removes every digits and tests that isMember
 	// also keeps working.
@@ -118,6 +134,20 @@ func TestAddRemoveAllSize(t *testing.T) {
 	}
 }
 
+func TestTwoMemberDigits(t *testing.T) {
+	d := Digits(0b0000000000100100)
+	d1, d2 := d.twoMemberDigits()
+	if d1 != 2 || d2 != 5 {
+		t.Errorf("got %v,%v, want 2 and 5", d1, d2)
+	}
+
+	d = Digits(0b0000001000000010)
+	d1, d2 = d.twoMemberDigits()
+	if d1 != 1 || d2 != 9 {
+		t.Errorf("got %v,%v, want 1 and 9", d1, d2)
+	}
+}
+
 func TestFullDigitsSet(t *testing.T) {
 	d := fullDigitsSet()
 	for dig := uint16(1); dig <= 9; dig++ {
@@ -130,3 +160,5 @@ func TestFullDigitsSet(t *testing.T) {
 		t.Errorf("got %v, want all digits", d.String())
 	}
 }
+
+// TODO: add tests for intersection, or remove it

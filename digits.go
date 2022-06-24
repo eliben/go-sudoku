@@ -22,6 +22,11 @@ func fullDigitsSet() Digits {
 	return 0b0000001111111110
 }
 
+// singleDigitSet returns a Digits with a single digit 'n' set.
+func singleDigitSet(n uint16) Digits {
+	return 1 << n
+}
+
 // isMember checks whether digit n is a member of the digit set d.
 func (d Digits) isMember(n uint16) bool {
 	return (d & (1 << n)) != 0

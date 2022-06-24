@@ -341,6 +341,35 @@ func Solve(values Values) (Values, bool) {
 	return values, false
 }
 
+// SolveAll finds all solutions to the given board and returns them. If no
+// solutions were found, and empty board is returned.
+// Warning: this function can take a LONG time to run for hard boards with
+// multiple solutions. For some boards it will run forever (e.g. finding
+// all solutions on an empty board).
+func SolveAll(values Values) []Values {
+	squareToTry := findSquareWithFewestCandidates(values)
+
+	if squareToTry == -1 {
+		return []Values{values}
+	}
+
+	var allSolved []Values
+
+	for d := uint16(1); d <= 9; d++ {
+		// Try to assign sq with each one of its candidate digits. If this results
+		// in a successful Solve() - we've solved the board!
+		if values[squareToTry].isMember(d) {
+			vcopy := slices.Clone(values)
+			if assign(vcopy, squareToTry, d) {
+				if vsolved := SolveAll(vcopy); len(vsolved) > 0 {
+					allSolved = append(allSolved, vsolved...)
+				}
+			}
+		}
+	}
+	return allSolved
+}
+
 // EnableStats enables statistics collection during the processes of solving.
 // When stats are enabled, solving will be slightly slower.
 //

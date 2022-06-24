@@ -207,6 +207,54 @@ func TestIsSolved(t *testing.T) {
 	}
 }
 
+func TestSolveAll(t *testing.T) {
+	v, err := ParseBoard(hardboard1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	vs := SolveAll(v)
+
+	if len(vs) != 1 {
+		t.Errorf("got %v solutions, want 1", len(vs))
+	}
+	if !IsSolved(vs[0]) {
+		t.Errorf("got %v, want solved board", vs[0])
+	}
+
+	// Now generate a multiple-solution board, by replacing all instances
+	// of 1 and 2 in the solved board by the digits set "12", permitting any
+	// combination of them to solve the board.
+	board := vs[0]
+	for sq, d := range board {
+		if d.size() == 1 && (d.isMember(1) || d.isMember(2)) {
+			board[sq] = d.add(1).add(2)
+		}
+	}
+
+	vs = SolveAll(board)
+	if len(vs) != 2 {
+		t.Errorf("got %v solved boards, want 2", len(vs))
+	}
+
+	if !IsSolved(vs[0]) || !IsSolved(vs[1]) {
+		t.Errorf("got unsolved boards")
+	}
+
+	// Create a board with a contradiction on purpose, and verify that SolveAll
+	// returns an empty list.
+	v, err = ParseBoard(hardboard1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	v[30] = singleDigitSet(1)
+	v[31] = singleDigitSet(2)
+	v[32] = singleDigitSet(3)
+	vs = SolveAll(v)
+	if len(vs) != 0 {
+		t.Errorf("expect unsolvable, got %v", vs)
+	}
+}
+
 // This board is unsolvable, but it takes the search a while to figure this
 // out.
 var impossible string = `

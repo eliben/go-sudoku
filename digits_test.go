@@ -160,3 +160,18 @@ func TestFullDigitsSet(t *testing.T) {
 		t.Errorf("got %v, want all digits", d.String())
 	}
 }
+
+func TestSingleDigitSet(t *testing.T) {
+	d := singleDigitSet(5)
+	for dig := uint16(1); dig <= 9; dig++ {
+		if dig == 5 {
+			if !d.isMember(dig) {
+				t.Errorf("got isMember=false for 5, want true")
+			}
+		} else {
+			if d.isMember(dig) {
+				t.Errorf("got isMember=true for %v, want false", dig)
+			}
+		}
+	}
+}

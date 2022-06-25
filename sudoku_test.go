@@ -73,8 +73,6 @@ var hardboard2 string = "..53.....8......2..7..1.5..4....53...1..7...6..32...8..
 
 // This is the sudoku board Norvig reported takes the longest for his program
 // to solve. Note that this board has multiple solutions.
-// TODO: write "long" test that explores solutions using N randomized runs,
-// and reports run-times?
 var hardlong string = `
 . . . |. . 6 |. . .
 . 5 9 |. . . |. . 8
@@ -280,11 +278,15 @@ func TestHardlong(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	// Find the first 100 solutions
-	vs := SolveAll(v, 100)
+	// The "hardlong" puzzle has multiple solutions. Norvig says he found 13
+	// different solutions, but there are vastly more. Use SolveAll to explore
+	// the first 1000 or so.
 
-	if len(vs) < 100 {
-		t.Errorf("got %v solutions, expected at least 100", len(vs))
+	// Find the first 1000 solutions
+	vs := SolveAll(v, 1000)
+
+	if len(vs) < 1000 {
+		t.Errorf("got %v solutions, expected at least 1000", len(vs))
 	}
 
 	for _, v := range vs {

@@ -363,13 +363,20 @@ func Solve(values Values, options SolveOptions) (Values, bool) {
 }
 
 // SolveAll finds all solutions to the given board and returns them. If no
-// solutions were found, and empty board is returned.
-// Warning: this function can take a LONG time to run for hard boards with
-// multiple solutions. For some boards it will run forever (e.g. finding
-// all solutions on an empty board).
-func SolveAll(values Values) []Values {
+// solutions were found, and empty board is returned. max can specify the
+// (approximate) maximal number of solutions to find; a value <= 0 means "all of
+// them". Often more solutions than max will be returned, but not a lot more
+// (maybe 2-3x as many).
+// Warning: this function can take a LONG time to run for boards with multiple
+// solutions, and it can consume enormous amounts of memory because it has to
+// remember each solution it finds. For some boards it will run forever (e.g.
+// finding all solutions on an empty board). If in doubt, use the max parameter
+// to restrict the number.
+func SolveAll(values Values, max int) []Values {
 	squareToTry := findSquareWithFewestCandidates(values)
 
+	// If we didn't find any square with more than one candidate, the board is
+	// solved!
 	if squareToTry == -1 {
 		return []Values{values}
 	}
@@ -382,8 +389,11 @@ func SolveAll(values Values) []Values {
 		if values[squareToTry].isMember(d) {
 			vcopy := slices.Clone(values)
 			if assign(vcopy, squareToTry, d) {
-				if vsolved := SolveAll(vcopy); len(vsolved) > 0 {
+				if vsolved := SolveAll(vcopy, max); len(vsolved) > 0 {
 					allSolved = append(allSolved, vsolved...)
+					if max > 0 && len(allSolved) >= max {
+						return allSolved
+					}
 				}
 			}
 		}

@@ -221,7 +221,7 @@ func TestSolveAll(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	vs := SolveAll(v)
+	vs := SolveAll(v, -1)
 
 	if len(vs) != 1 {
 		t.Errorf("got %v solutions, want 1", len(vs))
@@ -240,12 +240,22 @@ func TestSolveAll(t *testing.T) {
 		}
 	}
 
-	vs = SolveAll(board)
+	vs = SolveAll(board, -1)
 	if len(vs) != 2 {
 		t.Errorf("got %v solved boards, want 2", len(vs))
 	}
 
 	if !IsSolved(vs[0]) || !IsSolved(vs[1]) {
+		t.Errorf("got unsolved boards")
+	}
+
+	// Now try to limit max=1, see that SolveAll only returns a single solution.
+	vs = SolveAll(board, 1)
+	if len(vs) != 1 {
+		t.Errorf("got %v solved boards, want 1", len(vs))
+	}
+
+	if !IsSolved(vs[0]) {
 		t.Errorf("got unsolved boards")
 	}
 
@@ -258,9 +268,29 @@ func TestSolveAll(t *testing.T) {
 	v[30] = singleDigitSet(1)
 	v[31] = singleDigitSet(2)
 	v[32] = singleDigitSet(3)
-	vs = SolveAll(v)
+	vs = SolveAll(v, -1)
 	if len(vs) != 0 {
 		t.Errorf("expect unsolvable, got %v", vs)
+	}
+}
+
+func TestHardlong(t *testing.T) {
+	v, err := ParseBoard(hardlong)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Find the first 100 solutions
+	vs := SolveAll(v, 100)
+
+	if len(vs) < 100 {
+		t.Errorf("got %v solutions, expected at least 100", len(vs))
+	}
+
+	for _, v := range vs {
+		if !IsSolved(v) {
+			t.Errorf("got unsolved board %v", v)
+		}
 	}
 }
 

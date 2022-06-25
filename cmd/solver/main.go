@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 
 func main() {
 	statsFlag := flag.Bool("stats", false, "enable stats for solving")
+	randomizeFlag := flag.Bool("randomize", false, "randomize solving order")
 	flag.Parse()
 
 	var totalDuration time.Duration = 0
@@ -25,6 +27,10 @@ func main() {
 
 	if *statsFlag {
 		sudoku.EnableStats = true
+	}
+
+	if *randomizeFlag {
+		rand.Seed(time.Now().UnixNano())
 	}
 
 	// Expect one board per line, ignoring whitespace and lines starting with '#'.
@@ -39,7 +45,7 @@ func main() {
 
 		tStart := time.Now()
 		v, err := sudoku.ParseBoard(board)
-		v, _ = sudoku.Solve(v, sudoku.SolveOptions{})
+		v, _ = sudoku.Solve(v, sudoku.SolveOptions{Randomize: *randomizeFlag})
 		if err != nil {
 			log.Fatal(err)
 		}

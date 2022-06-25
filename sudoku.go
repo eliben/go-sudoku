@@ -113,6 +113,10 @@ func init() {
 	}
 }
 
+// TODO: we have to split the Parse from initial assignment/elimination --
+// otherwise estimating the difficulty of puzzles is hard. Maybe just as
+// a param to ParseBoard (e.g. propagate=true).
+//
 // ParseBoard parses a Sudoku board given in textual representation, and returns
 // it as Values. The textual representation is as described in
 // http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the

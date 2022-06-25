@@ -2,6 +2,7 @@ package sudoku
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 
@@ -254,6 +255,37 @@ func Display(values Values) string {
 	var sb strings.Builder
 	for sq, d := range values {
 		fmt.Fprintf(&sb, "%[1]*s", -width, fmt.Sprintf("%[1]*s", (width+d.size())/2, d))
+		if sq%9 == 2 || sq%9 == 5 {
+			sb.WriteString("|")
+		}
+		if sq%9 == 8 {
+			sb.WriteRune('\n')
+		}
+		if sq == 26 || sq == 53 {
+			sb.WriteString(line + "\n")
+		}
+	}
+	return sb.String()
+}
+
+// DisplayAsInput returns a 2D Sudoku input board corresponding to values.
+// It expects each square to have either 0 or 1 candidates.
+func DisplayAsInput(values Values) string {
+	line := strings.Join([]string{
+		strings.Repeat("-", 6),
+		strings.Repeat("-", 6),
+		strings.Repeat("-", 6)}, "+")
+
+	var sb strings.Builder
+	for sq, d := range values {
+		ds := d.String()
+		if d.size() == 9 {
+			ds = "."
+		} else if d.size() > 1 {
+			log.Fatalf("got square %d with candidates %s", sq, d)
+		}
+
+		fmt.Fprintf(&sb, "%s ", ds)
 		if sq%9 == 2 || sq%9 == 5 {
 			sb.WriteString("|")
 		}

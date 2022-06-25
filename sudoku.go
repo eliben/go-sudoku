@@ -165,7 +165,7 @@ func assign(values Values, square Index, digit uint16) bool {
 	for d := uint16(1); d <= 9; d++ {
 		// For each d 1..9 that's != digit, if d is set in
 		// values[square], try to eliminate it.
-		if values[square].isMember(d) && d != digit {
+		if values[square].IsMember(d) && d != digit {
 			if !eliminate(values, square, d) {
 				return false
 			}
@@ -179,22 +179,22 @@ func assign(values Values, square Index, digit uint16) bool {
 // It returns false if this results in an invalid Sudoku board; otherwise
 // returns true.
 func eliminate(values Values, square Index, digit uint16) bool {
-	if !values[square].isMember(digit) {
+	if !values[square].IsMember(digit) {
 		// Already eliminated
 		return true
 	}
 
 	// Remove digit from the candidates in square.
-	values[square] = values[square].remove(digit)
+	values[square] = values[square].Remove(digit)
 
-	switch values[square].size() {
+	switch values[square].Size() {
 	case 0:
 		// No remaining options for square -- this is a contradiction.
 		return false
 	case 1:
 		// A single digit candidate remaining in the square -- this creates a new
 		// constraint. Eliminate this digit from all peer squares.
-		remaining := values[square].singleMemberDigit()
+		remaining := values[square].SingleMemberDigit()
 		for _, peer := range peers[square] {
 			if !eliminate(values, peer, remaining) {
 				return false
@@ -210,7 +210,7 @@ UnitLoop:
 		// candidates. sqd marks the square, or -1 if no such square was found.
 		sqd := -1
 		for _, sq := range unit {
-			if values[sq].isMember(digit) {
+			if values[sq].IsMember(digit) {
 				if sqd == -1 {
 					sqd = sq
 				} else {
@@ -241,8 +241,8 @@ func Display(values Values) string {
 	// Find maximum length of one square.
 	var maxlen int = 0
 	for _, d := range values {
-		if d.size() > maxlen {
-			maxlen = d.size()
+		if d.Size() > maxlen {
+			maxlen = d.Size()
 		}
 	}
 	width := maxlen + 1
@@ -254,7 +254,7 @@ func Display(values Values) string {
 
 	var sb strings.Builder
 	for sq, d := range values {
-		fmt.Fprintf(&sb, "%[1]*s", -width, fmt.Sprintf("%[1]*s", (width+d.size())/2, d))
+		fmt.Fprintf(&sb, "%[1]*s", -width, fmt.Sprintf("%[1]*s", (width+d.Size())/2, d))
 		if sq%9 == 2 || sq%9 == 5 {
 			sb.WriteString("|")
 		}
@@ -279,9 +279,9 @@ func DisplayAsInput(values Values) string {
 	var sb strings.Builder
 	for sq, d := range values {
 		ds := d.String()
-		if d.size() == 9 {
+		if d.Size() == 9 {
 			ds = "."
-		} else if d.size() > 1 {
+		} else if d.Size() > 1 {
 			log.Fatalf("got square %d with candidates %s", sq, d)
 		}
 
@@ -304,7 +304,7 @@ func DisplayAsInput(values Values) string {
 func EmptyBoard() Values {
 	vals := make(Values, 81)
 	for sq := range vals {
-		vals[sq] = fullDigitsSet()
+		vals[sq] = FullDigitsSet()
 	}
 	return vals
 }
@@ -316,13 +316,13 @@ func IsSolved(values Values) bool {
 		var dset Digits
 		for _, sq := range unit {
 			// Some squares have more than a single candidate? Not solved.
-			if values[sq].size() != 1 {
+			if values[sq].Size() != 1 {
 				return false
 			}
-			dset = dset.add(values[sq].singleMemberDigit())
+			dset = dset.Add(values[sq].SingleMemberDigit())
 		}
 		// Not all digits covered by this unit? Not solved.
-		if dset != fullDigitsSet() {
+		if dset != FullDigitsSet() {
 			return false
 		}
 	}
@@ -335,8 +335,8 @@ func findSquareWithFewestCandidates(values Values) Index {
 	var squareToTry Index = -1
 	var minSize int = 10
 	for sq, d := range values {
-		if d.size() > 1 && d.size() < minSize {
-			minSize = d.size()
+		if d.Size() > 1 && d.Size() < minSize {
+			minSize = d.Size()
 			squareToTry = sq
 		}
 	}
@@ -383,7 +383,7 @@ func Solve(values Values, options SolveOptions) (Values, bool) {
 	for _, d := range candidates {
 		// Try to assign sq with each one of its candidate digits. If this results
 		// in a successful Solve() - we've solved the board!
-		if values[squareToTry].isMember(d) {
+		if values[squareToTry].IsMember(d) {
 			vcopy := slices.Clone(values)
 			if assign(vcopy, squareToTry, d) {
 				if vresult, solved := Solve(vcopy, options); solved {
@@ -419,7 +419,7 @@ func SolveAll(values Values, max int) []Values {
 	for d := uint16(1); d <= 9; d++ {
 		// Try to assign sq with each one of its candidate digits. If this results
 		// in a successful Solve() - we've solved the board!
-		if values[squareToTry].isMember(d) {
+		if values[squareToTry].IsMember(d) {
 			vcopy := slices.Clone(values)
 			if assign(vcopy, squareToTry, d) {
 				if vsolved := SolveAll(vcopy, max); len(vsolved) > 0 {

@@ -11,11 +11,11 @@ func TestIsMember(t *testing.T) {
 	var i uint16
 	for i = 1; i <= 9; i++ {
 		if i == 1 || i == 5 || i == 6 {
-			if !d.isMember(i) {
+			if !d.IsMember(i) {
 				t.Errorf("got isMember(%016b, %d)=false, want true", d, i)
 			}
 		} else {
-			if d.isMember(i) {
+			if d.IsMember(i) {
 				t.Errorf("got isMember(%016b, %d)=true, want false", d, i)
 			}
 		}
@@ -30,13 +30,13 @@ func TestAdd(t *testing.T) {
 	}
 
 	wantd2 := Digits(0b0000000001100110)
-	if d.add(2) != wantd2 {
-		t.Errorf("got wantd2=%v, want=%v", d.add(2), wantd2)
+	if d.Add(2) != wantd2 {
+		t.Errorf("got wantd2=%v, want=%v", d.Add(2), wantd2)
 	}
 
 	wantd5 := Digits(0b0000000001100010)
-	if d.add(5) != wantd5 {
-		t.Errorf("got wantd5=%v, want=%v", d.add(5), wantd5)
+	if d.Add(5) != wantd5 {
+		t.Errorf("got wantd5=%v, want=%v", d.Add(5), wantd5)
 	}
 }
 
@@ -44,17 +44,17 @@ func TestRemove(t *testing.T) {
 	d := Digits(0b0000000001100010)
 
 	wantd5 := Digits(0b0000000001000010)
-	if d.remove(5) != wantd5 {
-		t.Errorf("got wantd5=%v, want=%v", d.remove(5), wantd5)
+	if d.Remove(5) != wantd5 {
+		t.Errorf("got wantd5=%v, want=%v", d.Remove(5), wantd5)
 	}
 
 	wantd8 := Digits(0b0000000001100010)
-	if d.remove(8) != wantd8 {
-		t.Errorf("got wantd8=%v, want=%v", d.remove(8), wantd8)
+	if d.Remove(8) != wantd8 {
+		t.Errorf("got wantd8=%v, want=%v", d.Remove(8), wantd8)
 	}
 
 	wantd6no1 := Digits(0b0000000001000000)
-	donly6 := d.remove(1).remove(5)
+	donly6 := d.Remove(1).Remove(5)
 	if donly6 != wantd6no1 {
 		t.Errorf("got wantd6no1=%v, want=%v", donly6, wantd6no1)
 	}
@@ -67,13 +67,13 @@ func TestRemove(t *testing.T) {
 func TestRemoveAll(t *testing.T) {
 	d := Digits(0b0011100110)
 
-	got1 := d.removeAll(0b0011000000)
+	got1 := d.RemoveAll(0b0011000000)
 	want1 := Digits(0b0000100110)
 	if got1 != want1 {
 		t.Errorf("got %v, want %v", got1, want1)
 	}
 
-	got2 := d.removeAll(0b0001000110)
+	got2 := d.RemoveAll(0b0001000110)
 	want2 := Digits(0b0010100000)
 	if got2 != want2 {
 		t.Errorf("got %v, want %v", got2, want2)
@@ -81,7 +81,7 @@ func TestRemoveAll(t *testing.T) {
 }
 
 func TestAddRemoveAllSize(t *testing.T) {
-	// Exhaustive testing that adds/removes every digits and tests that isMember
+	// Exhaustive testing that adds/removes every digits and tests that IsMember
 	// also keeps working.
 
 	// Start with zero. Each iteration adds one digit, tests membership, then
@@ -89,13 +89,13 @@ func TestAddRemoveAllSize(t *testing.T) {
 	d := Digits(0)
 
 	testNoMembers := func() {
-		if d.size() != 0 {
-			t.Errorf("got size=%v, want 0", d.size())
+		if d.Size() != 0 {
+			t.Errorf("got size=%v, want 0", d.Size())
 		}
 
 		for dig := uint16(1); dig <= 9; dig++ {
-			if d.isMember(dig) {
-				t.Errorf("got isMember=true for %v, want false", dig)
+			if d.IsMember(dig) {
+				t.Errorf("got IsMember=true for %v, want false", dig)
 			}
 		}
 	}
@@ -104,55 +104,41 @@ func TestAddRemoveAllSize(t *testing.T) {
 	for dig := uint16(1); dig <= 9; dig++ {
 		t.Run(fmt.Sprintf("dig=%v", dig), func(t *testing.T) {
 			// Add 'dig' to set
-			d = d.add(dig)
+			d = d.Add(dig)
 
-			if d.size() != 1 {
-				t.Errorf("got size=%v, want 1", d.size())
+			if d.Size() != 1 {
+				t.Errorf("got size=%v, want 1", d.Size())
 			}
 
-			off := d.singleMemberDigit()
+			off := d.SingleMemberDigit()
 			if off != dig {
-				t.Errorf("got singleMemberDigit=%v, want %v", off, dig)
+				t.Errorf("got SingleMemberDigit=%v, want %v", off, dig)
 			}
 
 			// For each 'dig2', check set membership
 			for dig2 := uint16(1); dig2 <= 9; dig2++ {
 				if dig2 == dig {
-					if !d.isMember(dig2) {
-						t.Errorf("got isMember=false for %v, want true", dig2)
+					if !d.IsMember(dig2) {
+						t.Errorf("got IsMember=false for %v, want true", dig2)
 					}
 				} else {
-					if d.isMember(dig2) {
-						t.Errorf("got isMember=true for %v, want false", dig2)
+					if d.IsMember(dig2) {
+						t.Errorf("got IsMember=true for %v, want false", dig2)
 					}
 				}
 			}
 
-			d = d.remove(dig)
+			d = d.Remove(dig)
 			testNoMembers()
 		})
 	}
 }
 
-func TestTwoMemberDigits(t *testing.T) {
-	d := Digits(0b0000000000100100)
-	d1, d2 := d.twoMemberDigits()
-	if d1 != 2 || d2 != 5 {
-		t.Errorf("got %v,%v, want 2 and 5", d1, d2)
-	}
-
-	d = Digits(0b0000001000000010)
-	d1, d2 = d.twoMemberDigits()
-	if d1 != 1 || d2 != 9 {
-		t.Errorf("got %v,%v, want 1 and 9", d1, d2)
-	}
-}
-
 func TestFullDigitsSet(t *testing.T) {
-	d := fullDigitsSet()
+	d := FullDigitsSet()
 	for dig := uint16(1); dig <= 9; dig++ {
-		if !d.isMember(dig) {
-			t.Errorf("got isMember=false for %v, want true", dig)
+		if !d.IsMember(dig) {
+			t.Errorf("got IsMember=false for %v, want true", dig)
 		}
 	}
 
@@ -162,15 +148,15 @@ func TestFullDigitsSet(t *testing.T) {
 }
 
 func TestSingleDigitSet(t *testing.T) {
-	d := singleDigitSet(5)
+	d := SingleDigitSet(5)
 	for dig := uint16(1); dig <= 9; dig++ {
 		if dig == 5 {
-			if !d.isMember(dig) {
-				t.Errorf("got isMember=false for 5, want true")
+			if !d.IsMember(dig) {
+				t.Errorf("got IsMember=false for 5, want true")
 			}
 		} else {
-			if d.isMember(dig) {
-				t.Errorf("got isMember=true for %v, want false", dig)
+			if d.IsMember(dig) {
+				t.Errorf("got IsMember=true for %v, want false", dig)
 			}
 		}
 	}

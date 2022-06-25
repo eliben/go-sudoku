@@ -47,17 +47,17 @@ func TestAssignElimination(t *testing.T) {
 	// in square 20, and that it was eliminated from all the peers of 20.
 	assign(vals, 20, 5)
 
-	if vals[20].size() != 1 || vals[20].singleMemberDigit() != 5 {
+	if vals[20].Size() != 1 || vals[20].SingleMemberDigit() != 5 {
 		t.Errorf("got vals[20]=%v", vals[20])
 	}
 
 	for sq := 0; sq <= 80; sq++ {
 		if slices.Contains(peers[20], sq) {
-			if vals[sq].isMember(5) {
+			if vals[sq].IsMember(5) {
 				t.Errorf("got member 5 in peer square %v", sq)
 			}
 		} else {
-			if !vals[sq].isMember(5) {
+			if !vals[sq].IsMember(5) {
 				t.Errorf("got no member 5 in non-peer square %v", sq)
 			}
 		}
@@ -110,7 +110,7 @@ func TestParseBoard(t *testing.T) {
 	// to the number Norvig got.
 	var solvedSquares int
 	for _, d := range v2 {
-		if d.size() == 1 {
+		if d.Size() == 1 {
 			solvedSquares++
 		}
 	}
@@ -206,7 +206,7 @@ func TestIsSolved(t *testing.T) {
 	// ... modify by trying to add options to each square separately.
 	for sq := range v {
 		vcopy := slices.Clone(v)
-		vcopy[sq] = vcopy[sq].add(6).add(8)
+		vcopy[sq] = vcopy[sq].Add(6).Add(8)
 
 		if IsSolved(vcopy) {
 			t.Errorf("expect board to not be solved after modification: %v", vcopy)
@@ -233,8 +233,8 @@ func TestSolveAll(t *testing.T) {
 	// combination of them to solve the board.
 	board := vs[0]
 	for sq, d := range board {
-		if d.size() == 1 && (d.isMember(1) || d.isMember(2)) {
-			board[sq] = d.add(1).add(2)
+		if d.Size() == 1 && (d.IsMember(1) || d.IsMember(2)) {
+			board[sq] = d.Add(1).Add(2)
 		}
 	}
 
@@ -263,9 +263,9 @@ func TestSolveAll(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v[30] = singleDigitSet(1)
-	v[31] = singleDigitSet(2)
-	v[32] = singleDigitSet(3)
+	v[30] = SingleDigitSet(1)
+	v[31] = SingleDigitSet(2)
+	v[32] = SingleDigitSet(3)
 	vs = SolveAll(v, -1)
 	if len(vs) != 0 {
 		t.Errorf("expect unsolvable, got %v", vs)

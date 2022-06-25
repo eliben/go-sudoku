@@ -9,7 +9,10 @@ import (
 
 func TestGenerate(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
-	f := Generate()
+	f := Generate(25)
 	fmt.Println(f)
 	fmt.Println(Display(f))
+
+	sols := SolveAll(f, -1)
+	fmt.Println(len(sols))
 }

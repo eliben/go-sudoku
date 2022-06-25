@@ -234,7 +234,8 @@ UnitLoop:
 	return true
 }
 
-// Display returns a Sudoku 2D board representation of values
+// Display returns a visual representation of values, with all the digit
+// candidates as a string in each cell.
 func Display(values Values) string {
 	// Find maximum length of one square.
 	var maxlen int = 0
@@ -363,7 +364,7 @@ func Solve(values Values, options SolveOptions) (Values, bool) {
 }
 
 // SolveAll finds all solutions to the given board and returns them. If no
-// solutions were found, and empty board is returned. max can specify the
+// solutions were found, an empty list is returned. max can specify the
 // (approximate) maximal number of solutions to find; a value <= 0 means "all of
 // them". Often more solutions than max will be returned, but not a lot more
 // (maybe 2-3x as many).

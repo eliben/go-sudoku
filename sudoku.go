@@ -122,7 +122,8 @@ func init() {
 // propagation throughout the board.
 // It returns an error if there was an issue parsing the board, of if the board
 // isn't a valid Sudoku board (e.g. contradictions exist).
-func ParseBoard(str string) (Values, error) {
+// TODO: document eliminate
+func ParseBoard(str string, runElimination bool) (Values, error) {
 	var dgs []uint16
 
 	// Iterate and grab only the supported runes; ignore all others.
@@ -144,12 +145,38 @@ func ParseBoard(str string) (Values, error) {
 	// Assign square digits based on the parsed board. Note that this runs
 	// constraint propagation and may discover contradictions.
 	for sq, d := range dgs {
-		if d != 0 && !assign(values, sq, d) {
-			return nil, fmt.Errorf("contradiction when assigning %v to square %v", d, sq)
+		if d != 0 {
+			values[sq] = SingleDigitSet(d)
 		}
 	}
+	//fmt.Println(Display(values))
+
+	if runElimination && !EliminateAll(values) {
+		return nil, fmt.Errorf("contradiction when eliminating board")
+	}
+	//fmt.Println(Display(values))
 
 	return values, nil
+}
+
+// EliminateAll runs elimination on all assigned squares in values. It applies
+// first-order Sudoku heuristics on the entire board. Returns true if the
+// elimination is successful, and false if the boards has a contradiction.
+func EliminateAll(values Values) bool {
+	for sq, d := range values {
+		if d.Size() == 1 {
+			digit := d.SingleMemberDigit()
+			values[sq] = FullDigitsSet()
+			for dn := uint16(1); dn <= 9; dn++ {
+				if dn != digit {
+					if !eliminate(values, sq, dn) {
+						return false
+					}
+				}
+			}
+		}
+	}
+	return true
 }
 
 // assign attempts to assign digit to values[square], propagating

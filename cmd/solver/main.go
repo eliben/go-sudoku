@@ -44,7 +44,7 @@ func main() {
 		numBoards++
 
 		tStart := time.Now()
-		v, err := sudoku.ParseBoard(board)
+		v, err := sudoku.ParseBoard(board, true)
 		v, _ = sudoku.Solve(v, sudoku.SolveOptions{Randomize: *randomizeFlag})
 		if err != nil {
 			log.Fatal(err)

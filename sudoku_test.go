@@ -87,7 +87,8 @@ var hardlong string = `
 . . . |. . . |. . .`
 
 func TestParseBoard(t *testing.T) {
-	v, err := ParseBoard(easyboard1)
+	// Need to test the "false" variant of ParseBoard too
+	v, err := ParseBoard(easyboard1, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +98,7 @@ func TestParseBoard(t *testing.T) {
 	}
 
 	// Harder board that isn't fully solved without search.
-	v2, err := ParseBoard(hardboard1)
+	v2, err := ParseBoard(hardboard1, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +122,7 @@ func TestParseBoard(t *testing.T) {
 }
 
 func TestSolveBoard(t *testing.T) {
-	v, err := ParseBoard(hardboard1)
+	v, err := ParseBoard(hardboard1, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -137,7 +138,7 @@ func TestSolveBoard(t *testing.T) {
 
 	// Should work on the easy board also (even though it's solved with the
 	// initial parse)
-	v2, err := ParseBoard(easyboard1)
+	v2, err := ParseBoard(easyboard1, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -148,7 +149,7 @@ func TestSolveBoard(t *testing.T) {
 	}
 
 	// And the other hard board
-	v3, err := ParseBoard(hardboard2)
+	v3, err := ParseBoard(hardboard2, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -162,7 +163,7 @@ func TestSolveBoard(t *testing.T) {
 func TestSolveWithStats(t *testing.T) {
 	// The easy board is solved just by calling ParseBoard, needing no search.
 	WithStats(func() {
-		_, err := ParseBoard(easyboard1)
+		_, err := ParseBoard(easyboard1, true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -177,7 +178,7 @@ func TestSolveWithStats(t *testing.T) {
 		// For the hard board, we'll find both assigns and searches
 		Stats.Reset()
 
-		v, err := ParseBoard(hardboard1)
+		v, err := ParseBoard(hardboard1, true)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -193,7 +194,7 @@ func TestSolveWithStats(t *testing.T) {
 }
 
 func TestIsSolved(t *testing.T) {
-	v, err := ParseBoard(easyboard1)
+	v, err := ParseBoard(easyboard1, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +216,7 @@ func TestIsSolved(t *testing.T) {
 }
 
 func TestSolveAll(t *testing.T) {
-	v, err := ParseBoard(hardboard1)
+	v, err := ParseBoard(hardboard1, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -259,7 +260,7 @@ func TestSolveAll(t *testing.T) {
 
 	// Create a board with a contradiction on purpose, and verify that SolveAll
 	// returns an empty list.
-	v, err = ParseBoard(hardboard1)
+	v, err = ParseBoard(hardboard1, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -273,7 +274,7 @@ func TestSolveAll(t *testing.T) {
 }
 
 func TestHardlong(t *testing.T) {
-	v, err := ParseBoard(hardlong)
+	v, err := ParseBoard(hardlong, true)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -318,7 +319,7 @@ func TestImpossible(t *testing.T) {
 	}
 
 	WithStats(func() {
-		v, err := ParseBoard(impossible)
+		v, err := ParseBoard(impossible, true)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -350,7 +351,7 @@ func TestSolveHardest(t *testing.T) {
 	for _, board := range strings.Split(hardest, "\n") {
 		board = strings.TrimSpace(board)
 		if len(board) > 0 {
-			v, err := ParseBoard(board)
+			v, err := ParseBoard(board, true)
 			if err != nil {
 				log.Fatalf("error for board %v: %v", board, err)
 			}
@@ -396,13 +397,13 @@ func BenchmarkParseBoardAssign(b *testing.B) {
 	// propagation. We know that for easyboard1 it's fully solved with
 	// constraint propagation after parsing.
 	for i := 0; i < b.N; i++ {
-		_, _ = ParseBoard(easyboard1)
+		_, _ = ParseBoard(easyboard1, true)
 	}
 }
 
 func BenchmarkSolveBoardHardlong(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		v, err := ParseBoard(hardlong)
+		v, err := ParseBoard(hardlong, true)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -416,7 +417,7 @@ func BenchmarkSolveBoardHardlong(b *testing.B) {
 func BenchmarkSolveBoardHardlongRandomized(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < b.N; i++ {
-		v, err := ParseBoard(hardlong)
+		v, err := ParseBoard(hardlong, true)
 		if err != nil {
 			log.Fatal(err)
 		}

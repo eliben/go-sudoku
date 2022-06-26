@@ -68,11 +68,13 @@ func TestAssignElimination(t *testing.T) {
 // w/o any search.
 var easyboard1 string = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
 
+// Hard board from Norvig's example.
 var hardboard1 string = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
 var hardboard2 string = "..53.....8......2..7..1.5..4....53...1..7...6..32...8..6.5....9..4....3......97.."
 
-// This is the sudoku board Norvig reported takes the longest for his program
-// to solve. Note that this board has multiple solutions.
+// This is the program-generated sudoku board Norvig reported takes the longest
+// for his solver to crack. Note that this board has a very large number of
+// solutions.
 var hardlong string = `
 . . . |. . 6 |. . .
 . 5 9 |. . . |. . 8

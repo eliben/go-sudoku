@@ -117,12 +117,12 @@ func init() {
 // http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the
 // set [0123456789.], where 0 or . mean "unassigned". All other runes in the
 // string are ignored.
-// This function tries to end up with a valid board, so it will call `assign`
-// to assign digits specified in the inpput; this may invoke some constraint
-// propagation throughout the board.
+// If runElimination is false, the board is returned immediately after parsing.
+// If runElimination is true, ParseBoard will invoke EliminateAll on the board
+// and return the result. This is recommended when the board is then passed to
+// a solver.
 // It returns an error if there was an issue parsing the board, of if the board
 // isn't a valid Sudoku board (e.g. contradictions exist).
-// TODO: document eliminate
 func ParseBoard(str string, runElimination bool) (Values, error) {
 	var dgs []uint16
 

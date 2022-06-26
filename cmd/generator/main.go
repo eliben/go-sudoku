@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	f := sudoku.Generate(20)
+	f := sudoku.Generate(30)
 	fmt.Println(f)
 	fmt.Println(sudoku.Display(f))
 	fmt.Println(sudoku.DisplayAsInput(f))
@@ -22,6 +23,11 @@ func main() {
 		}
 	}
 	fmt.Println("Hint squares:", c)
+
+	if !sudoku.EliminateAll(f) {
+		log.Fatal("contradiction")
+	}
+	fmt.Println(sudoku.DisplayAsInput(f))
 
 	sols := sudoku.SolveAll(f, -1)
 	fmt.Println("Solutions:", len(sols))

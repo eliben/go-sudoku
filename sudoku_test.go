@@ -94,7 +94,22 @@ func TestParseBoard(t *testing.T) {
 	}
 
 	if !IsSolved(v) {
-		t.Errorf("expect easy board to be solved")
+		t.Errorf("expect easy board to be solved w/ elimination")
+	}
+
+	// Without runElimination, the easy board will not be immediately solved by
+	// parsing.
+	ve, err := ParseBoard(easyboard1, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if IsSolved(ve) {
+		t.Errorf("expect easy board to not be solved w/o elimination")
+	}
+
+	if !EliminateAll(ve) || !IsSolved(ve) {
+		t.Errorf("expect easy board to be solved with explicit elimination")
 	}
 
 	// Harder board that isn't fully solved without search.

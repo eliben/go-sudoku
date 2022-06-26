@@ -165,6 +165,10 @@ func ParseBoard(str string, runElimination bool) (Values, error) {
 func EliminateAll(values Values) bool {
 	for sq, d := range values {
 		if d.Size() == 1 {
+			// Because of how eliminate() works, we prepare for it by remembering
+			// which digit this square has assigned, setting the square to the full
+			// set of digits and then calling eliminate on all digits except the
+			// assigned one.
 			digit := d.SingleMemberDigit()
 			values[sq] = FullDigitsSet()
 			for dn := uint16(1); dn <= 9; dn++ {

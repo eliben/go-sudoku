@@ -2,7 +2,6 @@ package sudoku
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"strings"
 
@@ -113,10 +112,6 @@ func init() {
 	}
 }
 
-// TODO: we have to split the Parse from initial assignment/elimination --
-// otherwise estimating the difficulty of puzzles is hard. Maybe just as
-// a param to ParseBoard (e.g. propagate=true).
-//
 // ParseBoard parses a Sudoku board given in textual representation, and returns
 // it as Values. The textual representation is as described in
 // http://norvig.com/sudoku.html: a string with a sequence of 81 runes in the
@@ -273,7 +268,8 @@ func Display(values Values) string {
 }
 
 // DisplayAsInput returns a 2D Sudoku input board corresponding to values.
-// It expects each square to have either 0 or 1 candidates.
+// It treats solved squares (with one candidate) as hints that are filled into
+// the board, and unsolved squares (with more than one candidate) as empty.
 func DisplayAsInput(values Values) string {
 	line := strings.Join([]string{
 		strings.Repeat("-", 6),
@@ -283,12 +279,9 @@ func DisplayAsInput(values Values) string {
 	var sb strings.Builder
 	for sq, d := range values {
 		ds := d.String()
-		if d.Size() == 9 {
+		if d.Size() > 1 {
 			ds = "."
-		} else if d.Size() > 1 {
-			log.Fatalf("got square %d with candidates %s", sq, d)
 		}
-
 		fmt.Fprintf(&sb, "%s ", ds)
 		if sq%9 == 2 || sq%9 == 5 {
 			sb.WriteString("|")

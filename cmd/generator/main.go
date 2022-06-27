@@ -11,7 +11,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	f := sudoku.Generate(22)
+	f := sudoku.Generate(20)
 	fmt.Println(f)
 	fmt.Println(sudoku.Display(f))
 	fmt.Println(sudoku.DisplayAsInput(f))

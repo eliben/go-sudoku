@@ -31,5 +31,9 @@ func TestEvaluateDifficulty(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	EvaluateDifficulty(v)
+	d, err := EvaluateDifficulty(v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(d)
 }

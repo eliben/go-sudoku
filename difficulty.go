@@ -11,7 +11,8 @@ import (
 // 2. Count hints after elimination
 // 3. Count the low bound on empty rows/cols pre (or after?) elimination
 // 4. Count how difficult average (maximal?) search is over a few random tries
-func EvaluateDifficulty(values Values) (int, error) {
+func EvaluateDifficulty(values Values) (float64, error) {
+	// Counts the total number of hints on the board.
 	countHints := func() int {
 		hintcount := 0
 		for _, d := range values {
@@ -24,8 +25,8 @@ func EvaluateDifficulty(values Values) (int, error) {
 
 	hintsBeforeElimination := countHints()
 
-	// Count the lower bound (minimal number) of hints in rows and cols, pre
-	// elimination.
+	// Count the lower bound (minimal number) of hints in individual rows and
+	// cols, pre elimination.
 	minHints := 9
 
 	index := func(row, col int) Index {
@@ -58,14 +59,16 @@ func EvaluateDifficulty(values Values) (int, error) {
 		}
 	}
 
+	// Run elimination and count how many hints are on the board after it.
 	if !EliminateAll(values) {
 		return 0, fmt.Errorf("contradiction in board")
 	}
 	hintsAfterElimination := countHints()
 
+	// Run a number of randomized searches and count the average search count.
 	EnableStats = true
 	var totalSearches uint64 = 0
-	iterations := 100
+	iterations := 25
 	for i := 0; i < iterations; i++ {
 		Stats.Reset()
 		_, solved := Solve(values, SolveOptions{Randomize: true})
@@ -94,11 +97,11 @@ func EvaluateDifficulty(values Values) (int, error) {
 	var hintsAfterDifficulty float64
 	if hintsAfterElimination > 55 {
 		hintsAfterDifficulty = 1.0
-	} else if hintsAfterElimination > 40 {
+	} else if hintsAfterElimination > 42 {
 		hintsAfterDifficulty = 2.0
-	} else if hintsAfterElimination > 36 {
+	} else if hintsAfterElimination > 37 {
 		hintsAfterDifficulty = 3.0
-	} else if hintsAfterElimination > 32 {
+	} else if hintsAfterElimination > 33 {
 		hintsAfterDifficulty = 4.0
 	} else {
 		hintsAfterDifficulty = 5.0
@@ -111,7 +114,7 @@ func EvaluateDifficulty(values Values) (int, error) {
 		minHintsDifficulty = 2.0
 	} else if minHints == 3 {
 		minHintsDifficulty = 3.0
-	} else if minHints == 2 {
+	} else if minHints >= 1 {
 		minHintsDifficulty = 4.0
 	} else {
 		minHintsDifficulty = 5.0
@@ -124,7 +127,7 @@ func EvaluateDifficulty(values Values) (int, error) {
 		searchDifficulty = 2.0
 	} else if averageSearches < 8.0 {
 		searchDifficulty = 3.0
-	} else if averageSearches < 25.0 {
+	} else if averageSearches < 30.0 {
 		searchDifficulty = 4.0
 	} else {
 		searchDifficulty = 5.0
@@ -135,5 +138,11 @@ func EvaluateDifficulty(values Values) (int, error) {
 	fmt.Printf("minHints: %v, minHintsDifficulty: %v\n", minHints, minHintsDifficulty)
 	fmt.Printf("averageSearches: %v, searchDifficulty: %v\n", averageSearches, searchDifficulty)
 
-	return 0, nil
+	// Assign final difficulty with weights
+	difficulty := 0.5*hintsAfterDifficulty +
+		0.3*hintsBeforeDifficulty +
+		0.05*minHintsDifficulty +
+		0.15*searchDifficulty
+
+	return difficulty, nil
 }

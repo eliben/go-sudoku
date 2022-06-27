@@ -2,7 +2,6 @@ package sudoku
 
 import (
 	"fmt"
-	"log"
 )
 
 // TODO: doc
@@ -13,7 +12,7 @@ import (
 // 3. Count the low bound on empty rows/cols pre (or after?) elimination
 // 4. Count how difficult average (maximal?) search is over a few random tries
 func EvaluateDifficulty(values Values) (int, error) {
-	countHits := func() int {
+	countHints := func() int {
 		hintcount := 0
 		for _, d := range values {
 			if d.Size() == 1 {
@@ -23,7 +22,7 @@ func EvaluateDifficulty(values Values) (int, error) {
 		return hintcount
 	}
 
-	fmt.Println("hintcount before elimination:", countHits())
+	hintsBeforeElimination := countHints()
 
 	// Count the lower bound (minimal number) of hints in rows and cols, pre
 	// elimination.
@@ -59,36 +58,82 @@ func EvaluateDifficulty(values Values) (int, error) {
 		}
 	}
 
-	fmt.Println("min hints:", minHints)
-
 	if !EliminateAll(values) {
 		return 0, fmt.Errorf("contradiction in board")
 	}
-
-	fmt.Println("hintcount after elimination:", countHits())
-
-	countSearches := func() (uint64, error) {
-		_, solved := Solve(values, SolveOptions{Randomize: true})
-		if !solved {
-			return 0, fmt.Errorf("cannot solve")
-		}
-
-		return Stats.NumSearches, nil
-	}
+	hintsAfterElimination := countHints()
 
 	EnableStats = true
 	var totalSearches uint64 = 0
 	iterations := 100
 	for i := 0; i < iterations; i++ {
 		Stats.Reset()
-		count, err := countSearches()
-		if err != nil {
-			log.Fatal(err)
+		_, solved := Solve(values, SolveOptions{Randomize: true})
+		if !solved {
+			return 0, fmt.Errorf("cannot solve")
 		}
-		totalSearches += count
+		totalSearches += Stats.NumSearches
 	}
 	EnableStats = false
+	averageSearches := float64(totalSearches) / float64(iterations)
 
-	fmt.Println("average searches:", float64(totalSearches)/float64(iterations))
+	// Assign difficulty scores based on ranges in each category.
+	var hintsBeforeDifficulty float64
+	if hintsBeforeElimination > 50 {
+		hintsBeforeDifficulty = 1.0
+	} else if hintsBeforeElimination > 35 {
+		hintsBeforeDifficulty = 2.0
+	} else if hintsBeforeElimination > 31 {
+		hintsBeforeDifficulty = 3.0
+	} else if hintsBeforeElimination > 27 {
+		hintsBeforeDifficulty = 4.0
+	} else {
+		hintsBeforeDifficulty = 5.0
+	}
+
+	var hintsAfterDifficulty float64
+	if hintsAfterElimination > 55 {
+		hintsAfterDifficulty = 1.0
+	} else if hintsAfterElimination > 40 {
+		hintsAfterDifficulty = 2.0
+	} else if hintsAfterElimination > 36 {
+		hintsAfterDifficulty = 3.0
+	} else if hintsAfterElimination > 32 {
+		hintsAfterDifficulty = 4.0
+	} else {
+		hintsAfterDifficulty = 5.0
+	}
+
+	var minHintsDifficulty float64
+	if minHints >= 5 {
+		minHintsDifficulty = 1.0
+	} else if minHints == 4 {
+		minHintsDifficulty = 2.0
+	} else if minHints == 3 {
+		minHintsDifficulty = 3.0
+	} else if minHints == 2 {
+		minHintsDifficulty = 4.0
+	} else {
+		minHintsDifficulty = 5.0
+	}
+
+	var searchDifficulty float64
+	if averageSearches <= 1.0 {
+		searchDifficulty = 1.0
+	} else if averageSearches < 3.0 {
+		searchDifficulty = 2.0
+	} else if averageSearches < 8.0 {
+		searchDifficulty = 3.0
+	} else if averageSearches < 25.0 {
+		searchDifficulty = 4.0
+	} else {
+		searchDifficulty = 5.0
+	}
+
+	fmt.Printf("hintsBeforeElimination: %v, hintsBeforeDifficulty: %v\n", hintsBeforeElimination, hintsBeforeDifficulty)
+	fmt.Printf("hintsAfterlimination: %v, hintsAfterifficulty: %v\n", hintsAfterElimination, hintsAfterDifficulty)
+	fmt.Printf("minHints: %v, minHintsDifficulty: %v\n", minHints, minHintsDifficulty)
+	fmt.Printf("averageSearches: %v, searchDifficulty: %v\n", averageSearches, searchDifficulty)
+
 	return 0, nil
 }

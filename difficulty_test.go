@@ -25,7 +25,7 @@ var h4 string = `
 
 func TestEvaluateDifficulty(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
-	v, err := ParseBoard(h4, false)
+	v, err := ParseBoard(easyboard1, false)
 	fmt.Println(DisplayAsInput(v))
 	if err != nil {
 		t.Fatal(err)

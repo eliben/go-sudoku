@@ -1,6 +1,9 @@
 package sudoku
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 // TODO: doc
 
@@ -63,5 +66,29 @@ func EvaluateDifficulty(values Values) (int, error) {
 	}
 
 	fmt.Println("hintcount after elimination:", countHits())
+
+	countSearches := func() (uint64, error) {
+		_, solved := Solve(values, SolveOptions{Randomize: true})
+		if !solved {
+			return 0, fmt.Errorf("cannot solve")
+		}
+
+		return Stats.NumSearches, nil
+	}
+
+	EnableStats = true
+	var totalSearches uint64 = 0
+	iterations := 100
+	for i := 0; i < iterations; i++ {
+		Stats.Reset()
+		count, err := countSearches()
+		if err != nil {
+			log.Fatal(err)
+		}
+		totalSearches += count
+	}
+	EnableStats = false
+
+	fmt.Println("average searches:", float64(totalSearches)/float64(iterations))
 	return 0, nil
 }

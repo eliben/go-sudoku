@@ -389,16 +389,16 @@ type SolveOptions struct {
 // Consider making SolveOptions ... so they're not mandatory, but panic if more
 // than 1.
 func Solve(values Values, options SolveOptions) (Values, bool) {
-	if EnableStats {
-		Stats.NumSearches++
-	}
-
 	squareToTry := findSquareWithFewestCandidates(values)
 
 	// If we didn't find any square with more than one candidate, the board is
 	// solved!
 	if squareToTry == -1 {
 		return values, true
+	}
+
+	if EnableStats {
+		Stats.NumSearches++
 	}
 
 	var candidates = []uint16{1, 2, 3, 4, 5, 6, 7, 8, 9}

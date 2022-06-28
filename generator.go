@@ -51,3 +51,55 @@ func Generate(hintCount int) Values {
 
 	return board
 }
+
+// GenerateSymmetrical is similar to Generate, but it generates symmetrical
+// boards with 180-degree rotational symmetry.
+// Because of this additional constraint, it may have more trouble generating
+// boards with a small hintCount than Generate, so you'll have to run it more
+// times in a loop to find a good low-hint-count board.
+func GenerateSymmetrical(hintCount int) Values {
+	empty := EmptyBoard()
+	board, solved := Solve(empty, SolveOptions{Randomize: true})
+	if !solved || !IsSolved(board) {
+		log.Fatal("unable to generate solved board from empty")
+	}
+
+	// This function works just like Generate, but instead of picking a random
+	// square out of all 81, it picks a random square from the first half of the
+	// board and then attempts to remove both this square and its reflection.
+	removalOrder := rand.Perm(41)
+	count := 81
+
+	for _, sq := range removalOrder {
+		// Find sq's reflection; note that in the middle row reflectSq could equal
+		// sq - we take this into account when counting how many hints remain on
+		// the board.
+		reflectSq := 80 - sq
+
+		savedDigit := board[sq]
+		savedReflect := board[reflectSq]
+
+		board[sq] = FullDigitsSet()
+		board[reflectSq] = FullDigitsSet()
+
+		solutions := SolveAll(board, 2)
+		switch len(solutions) {
+		case 0:
+			log.Fatal("got a board without solutions")
+		case 1:
+			// We may have removed just one or two hints.
+			count--
+			if sq != reflectSq {
+				count--
+			}
+			if count <= hintCount {
+				return board
+			}
+		default:
+			board[sq] = savedDigit
+			board[reflectSq] = savedReflect
+		}
+	}
+
+	return board
+}

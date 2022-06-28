@@ -21,18 +21,7 @@ import (
 // This approach was partially inspired by the paper "Sudoku Puzzles Generating:
 // from Easy to Evil" by Xiang-Sun ZHANG's research group.
 func EvaluateDifficulty(values Values) (float64, error) {
-	// Counts the total number of hints on the board.
-	countHints := func() int {
-		hintcount := 0
-		for _, d := range values {
-			if d.Size() == 1 {
-				hintcount++
-			}
-		}
-		return hintcount
-	}
-
-	hintsBeforeElimination := countHints()
+	hintsBeforeElimination := countHints(values)
 
 	// Count the lower bound (minimal number) of hints in individual rows and
 	// cols, pre elimination.
@@ -72,7 +61,7 @@ func EvaluateDifficulty(values Values) (float64, error) {
 	if !EliminateAll(values) {
 		return 0, fmt.Errorf("contradiction in board")
 	}
-	hintsAfterElimination := countHints()
+	hintsAfterElimination := countHints(values)
 
 	// Run a number of randomized searches and count the average search count.
 	EnableStats = true

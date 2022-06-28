@@ -183,6 +183,17 @@ func EliminateAll(values Values) bool {
 	return true
 }
 
+// countHints counts the total number of hints on the board.
+func countHints(values Values) int {
+	hintcount := 0
+	for _, d := range values {
+		if d.Size() == 1 {
+			hintcount++
+		}
+	}
+	return hintcount
+}
+
 // assign attempts to assign digit to values[square], propagating
 // constraints from the assignment. values is modified.
 // It returns true if the assignment succeeded, and false if the assignment

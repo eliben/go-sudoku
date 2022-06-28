@@ -18,9 +18,9 @@ func TestInit(t *testing.T) {
 	}
 
 	wantUnits := []Unit{
-		Unit{18, 19, 20, 21, 22, 23, 24, 25, 26},
-		Unit{2, 11, 20, 29, 38, 47, 56, 65, 74},
-		Unit{0, 1, 2, 9, 10, 11, 18, 19, 20}}
+		{18, 19, 20, 21, 22, 23, 24, 25, 26},
+		{2, 11, 20, 29, 38, 47, 56, 65, 74},
+		{0, 1, 2, 9, 10, 11, 18, 19, 20}}
 
 	if !slices.EqualFunc(wantUnits, units[20], func(a, b Unit) bool {
 		return slices.Equal(a, b)

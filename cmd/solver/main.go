@@ -14,12 +14,32 @@ import (
 )
 
 // TODO: add real help / flags
+var statsFlag = flag.Bool("stats", false, "enable stats for solving")
+var randomizeFlag = flag.Bool("randomize", false, "randomize solving order")
+var actionFlag = flag.String("action", "solve", "action to perform: solve, count")
 
 func main() {
-	statsFlag := flag.Bool("stats", false, "enable stats for solving")
-	randomizeFlag := flag.Bool("randomize", false, "randomize solving order")
+	flag.Usage = func() {
+		out := flag.CommandLine.Output()
+		fmt.Fprintln(out, "usage: solver [options] <input in stdin>")
+		fmt.Fprintln(out, "Options:")
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 
+	switch *actionFlag {
+	case "solve":
+		solveAndReport()
+	case "count":
+		count()
+	default:
+		flag.Usage()
+		log.Fatal("Please select one of the supported actions.")
+	}
+}
+
+func solveAndReport() {
 	var totalDuration time.Duration = 0
 	var maxDuration time.Duration = 0
 	var totalSearches uint64 = 0
@@ -36,14 +56,8 @@ func main() {
 		rand.Seed(time.Now().UnixNano())
 	}
 
-	// Expect one board per line, ignoring whitespace and lines starting with '#'.
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		board := strings.TrimSpace(scanner.Text())
-		if len(board) == 0 || strings.HasPrefix(board, "#") {
-			continue
-		}
-
+	boards := getInputBoards()
+	for _, board := range boards {
 		numBoards++
 
 		v, err := sudoku.ParseBoard(board, false)
@@ -82,14 +96,34 @@ func main() {
 		}
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-
 	fmt.Printf("Solved %v/%v boards\n", numSolved, numBoards)
 	fmt.Printf("Average difficulty: %.2v\n", totalDifficulty/float64(numBoards))
 	fmt.Printf("Duration average=%-15v max=%v\n", totalDuration/time.Duration(numBoards), maxDuration)
 	if *statsFlag {
 		fmt.Printf("Searches average=%-15.2f max=%v\n", float64(totalSearches)/float64(numBoards), maxSearches)
 	}
+}
+
+func count() {
+}
+
+// getInputBoards reads input boards from stdin, ignores comments and empty lines
+// and returns them.
+func getInputBoards() []string {
+	var boards []string
+
+	scanner := bufio.NewScanner(os.Stdin)
+	// Expect one board per line, ignoring whitespace and lines starting with '#'.
+	for scanner.Scan() {
+		board := strings.TrimSpace(scanner.Text())
+		if len(board) == 0 || strings.HasPrefix(board, "#") {
+			continue
+		}
+		boards = append(boards, board)
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return boards
 }

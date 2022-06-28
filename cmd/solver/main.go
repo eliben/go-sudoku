@@ -32,7 +32,7 @@ func main() {
 	case "solve":
 		solveAndReport()
 	case "count":
-		count()
+		countHints()
 	default:
 		flag.Usage()
 		log.Fatal("Please select one of the supported actions.")
@@ -104,7 +104,22 @@ func solveAndReport() {
 	}
 }
 
-func count() {
+func countHints() {
+	boards := getInputBoards()
+	for _, board := range boards {
+		fmt.Println("board:", board)
+		v, err := sudoku.ParseBoard(board, false)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("|")
+
+		fmt.Printf("\\ initial num hints:           %v\n", sudoku.CountHints(v))
+
+		sudoku.EliminateAll(v)
+		fmt.Printf("  num hints after elimination: %v\n", sudoku.CountHints(v))
+		fmt.Println("")
+	}
 }
 
 // getInputBoards reads input boards from stdin, ignores comments and empty lines

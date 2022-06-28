@@ -4,13 +4,22 @@ import (
 	"fmt"
 )
 
-// TODO: doc
-
-// The before/after elimination distinction is very important here...
-// 1. Count hints before elimination
-// 2. Count hints after elimination
-// 3. Count the low bound on empty rows/cols pre (or after?) elimination
-// 4. Count how difficult average (maximal?) search is over a few random tries
+// EvaluateDifficulty evaluates the difficulty of a Sudoku puzzle heuristically
+// and returns the score on a scale from 1.0 (easiest) to 5.0 hardest. It can
+// also return an error if the given board has contradictions, is unsolvable,
+// etc.
+//
+// The heuristics are based on 4 factors:
+//
+// 1. How many hints (filled-in squares) the board has.
+// 2. How many hints remain after running a round of elimination (first-order
+//    Sudoku solving value deduction).
+// 3. How many hints does a row or column with the minimal number of hints have
+// 4. How many guesses a backtracking search requires to solve the board
+//    (averaged over multiple runs).
+//
+// This approach was partially inspired by the paper "Sudoku Puzzles Generating:
+// from Easy to Evil" by Xiang-Sun ZHANG's research group.
 func EvaluateDifficulty(values Values) (float64, error) {
 	// Counts the total number of hints on the board.
 	countHints := func() int {
@@ -125,18 +134,13 @@ func EvaluateDifficulty(values Values) (float64, error) {
 		searchDifficulty = 1.0
 	} else if averageSearches < 3.0 {
 		searchDifficulty = 2.0
-	} else if averageSearches < 8.0 {
+	} else if averageSearches < 10.0 {
 		searchDifficulty = 3.0
-	} else if averageSearches < 30.0 {
+	} else if averageSearches < 40.0 {
 		searchDifficulty = 4.0
 	} else {
 		searchDifficulty = 5.0
 	}
-
-	fmt.Printf("hintsBeforeElimination: %v, hintsBeforeDifficulty: %v\n", hintsBeforeElimination, hintsBeforeDifficulty)
-	fmt.Printf("hintsAfterlimination: %v, hintsAfterifficulty: %v\n", hintsAfterElimination, hintsAfterDifficulty)
-	fmt.Printf("minHints: %v, minHintsDifficulty: %v\n", minHints, minHintsDifficulty)
-	fmt.Printf("averageSearches: %v, searchDifficulty: %v\n", averageSearches, searchDifficulty)
 
 	// Assign final difficulty with weights
 	difficulty := 0.5*hintsAfterDifficulty +

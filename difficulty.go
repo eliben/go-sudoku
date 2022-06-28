@@ -7,7 +7,7 @@ import (
 // EvaluateDifficulty evaluates the difficulty of a Sudoku puzzle heuristically
 // and returns the score on a scale from 1.0 (easiest) to 5.0 hardest. It can
 // also return an error if the given board has contradictions, is unsolvable,
-// etc.
+// etc. It should be passed a board that didn't have elimination applied to it.
 //
 // The heuristics are based on 4 factors:
 //

@@ -183,8 +183,8 @@ func EliminateAll(values Values) bool {
 	return true
 }
 
-// countHints counts the total number of hints on the board.
-func countHints(values Values) int {
+// CountHints counts the total number of hints on the board.
+func CountHints(values Values) int {
 	hintcount := 0
 	for _, d := range values {
 		if d.Size() == 1 {

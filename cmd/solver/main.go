@@ -13,6 +13,8 @@ import (
 	"github.com/eliben/go-sudoku"
 )
 
+// TODO: add real help / flags
+
 func main() {
 	statsFlag := flag.Bool("stats", false, "enable stats for solving")
 	randomizeFlag := flag.Bool("randomize", false, "randomize solving order")

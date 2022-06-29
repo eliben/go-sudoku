@@ -114,16 +114,22 @@ func countHints() {
 		}
 		fmt.Println("|")
 
-		fmt.Printf("\\ initial num hints:           %v\n", sudoku.CountHints(v))
+		initialNumHints := sudoku.CountHints(v)
+		fmt.Printf("\\ initial num hints:           %v\n", initialNumHints)
 
 		sudoku.EliminateAll(v)
-		fmt.Printf("  num hints after elimination: %v\n", sudoku.CountHints(v))
+		afterElimNumHints := sudoku.CountHints(v)
+		fmt.Printf("  num hints after elimination: %v\n", afterElimNumHints)
+
+		sudoku.ApplyTwinsStrategy(v)
+		afterTwinsNumHints := sudoku.CountHints(v)
+		fmt.Printf("  num hints after twins:       %v\n", afterTwinsNumHints)
 		fmt.Println("")
 	}
 }
 
-// getInputBoards reads input boards from stdin, ignores comments and empty lines
-// and returns them.
+// getInputBoards reads input boards from stdin, ignores comments and empty
+// lines and returns them.
 func getInputBoards() []string {
 	var boards []string
 

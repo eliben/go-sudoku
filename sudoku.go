@@ -526,13 +526,13 @@ RepeatStrategy:
 			var removed bool
 			for d, count := range dcount {
 				if d.Size() == 2 && count == 2 {
-					fmt.Printf("found candidates '%s' with count 2\n", d)
+					//fmt.Printf("found candidates '%s' with count 2 (unit %v)\n", d, unit)
 					// Found it! Now go over all the squares in this unit other than the
 					// ones with these exact two candidates, and eliminate both candidates
 					// from them.
 					d1, d2 := d.twoMemberDigits()
 					for _, sq := range unit {
-						if values[sq].Size() > 2 && values[sq] != d {
+						if values[sq].Size() >= 2 && values[sq] != d {
 							if values[sq].IsMember(d1) {
 								if !eliminate(values, sq, d1) {
 									return false

@@ -59,6 +59,14 @@ func (d Digits) SingleMemberDigit() uint16 {
 	return uint16(bits.TrailingZeros16(uint16(d)))
 }
 
+// twoMemberDigits returns the only two digits that are member of a 2-element
+// set; this assumes that the set indeed has two elements.
+func (d Digits) twoMemberDigits() (uint16, uint16) {
+	d1 := uint16(bits.TrailingZeros16(uint16(d)))
+	d2 := 16 - uint16(bits.LeadingZeros16(uint16(d))) - 1
+	return d1, d2
+}
+
 // String implements the fmt.Stringer interface for Digits.
 func (d Digits) String() string {
 	var parts []string

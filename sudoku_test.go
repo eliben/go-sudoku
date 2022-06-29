@@ -314,6 +314,25 @@ func TestHardlong(t *testing.T) {
 	}
 }
 
+func TestApplyTwinsStrategy(t *testing.T) {
+	// Basic test: on an empty board, leave only candidates 38 for two squares
+	// and verify that twin elimination removed what was needed.
+	v := EmptyBoard()
+	d38 := Digits(0).Add(3).Add(8)
+	v[30] = d38
+	v[31] = d38
+
+	fmt.Println(Display(v))
+	ApplyTwinsStrategy(v)
+	fmt.Println(Display(v))
+
+	for _, sq := range []Index{27, 28, 39, 32, 33, 34, 35, 39, 40, 41, 48, 49, 50} {
+		if v[sq].IsMember(3) || v[sq].IsMember(8) {
+			t.Errorf("got board[%v]=%s, expect no 3 or 8", sq, v[sq])
+		}
+	}
+}
+
 // This board is unsolvable, but it takes the search a while to figure this
 // out.
 var impossible string = `

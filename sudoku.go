@@ -28,6 +28,8 @@ type Index = int
 
 // Unit is a list of square indices that belong to the same Sudoku
 // unit - a row, column or 3x3 block which should contain unique digits.
+// There are overlaps between many units - e.g. a single square will be a member
+// of a row unit, a column unit and a 3x3 block unit.
 type Unit = []Index
 
 // Values represents a Sudoku board in a format that's usable for solving.
@@ -503,4 +505,56 @@ func WithStats(f func()) {
 	Stats.Reset()
 
 	f()
+}
+
+func ApplyTwinsStrategy(values Values) bool {
+RepeatStrategy:
+	for {
+		for _, unit := range unitlist {
+			// dcount will map Digits->count, counting how many times a certain
+			// combination of digit candidates appears in this unit.
+			dcount := make(map[Digits]int)
+			for _, sq := range unit {
+				dcount[values[sq]]++
+			}
+
+			// Find a combination that has exactly two digits and appears exactly
+			// twice in the unit -- this is a twin. For example, two squares in the
+			// same row cell may have 38 as their only candidates, which means that 3
+			// and 8 must occupy these squares (though we don't know which goes
+			// where), and that no other square in the unit may have either 3 or 8.
+			var removed bool
+			for d, count := range dcount {
+				if d.Size() == 2 && count == 2 {
+					fmt.Printf("found candidates '%s' with count 2\n", d)
+					// Found it! Now go over all the squares in this unit other than the
+					// ones with these exact two candidates, and eliminate both candidates
+					// from them.
+					d1, d2 := d.twoMemberDigits()
+					for _, sq := range unit {
+						if values[sq].Size() > 2 && values[sq] != d {
+							if values[sq].IsMember(d1) {
+								if !eliminate(values, sq, d1) {
+									return false
+								}
+								removed = true
+							}
+							if values[sq].IsMember(d2) {
+								if !eliminate(values, sq, d2) {
+									return false
+								}
+								removed = true
+							}
+						}
+					}
+				}
+				if removed {
+					fmt.Println("repeating...")
+					continue RepeatStrategy
+				}
+			}
+		}
+		return true
+	}
+	panic("unreachable!")
 }

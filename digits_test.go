@@ -161,3 +161,17 @@ func TestSingleDigitSet(t *testing.T) {
 		}
 	}
 }
+
+func TestTwoMemberDigits(t *testing.T) {
+	d := Digits(0b0000000000100100)
+	d1, d2 := d.twoMemberDigits()
+	if d1 != 2 || d2 != 5 {
+		t.Errorf("got %v,%v, want 2 and 5", d1, d2)
+	}
+
+	d = Digits(0b0000001000000010)
+	d1, d2 = d.twoMemberDigits()
+	if d1 != 1 || d2 != 9 {
+		t.Errorf("got %v,%v, want 1 and 9", d1, d2)
+	}
+}

@@ -163,7 +163,7 @@ func ParseBoard(str string, runElimination bool) (Values, error) {
 
 // EliminateAll runs elimination on all assigned squares in values. It applies
 // first-order Sudoku heuristics on the entire board. Returns true if the
-// elimination is successful, and false if the boards has a contradiction.
+// elimination is successful, and false if the board has a contradiction.
 func EliminateAll(values Values) bool {
 	for sq, d := range values {
 		if d.Size() == 1 {
@@ -507,7 +507,19 @@ func WithStats(f func()) {
 	f()
 }
 
+// ApplyTwinsStrategy applies the "naked twins" Sudoku strategy to the given
+// board and updates it. It returns false if there was a contradiction
+// discovered while applying the strategy.
+// The "naked twins" strategy is to find two digits that are the only candidates
+// in two squares in the same unit. This helps eliminate these digits from
+// other squares in the same unit.
+// For example, two squares in the same row cell may have 38 as their only
+// candidates, which means that 3 and 8 must occupy these squares (though we
+// don't know which goes where), and that no other square in the unit may have
+// either 3 or 8.
 func ApplyTwinsStrategy(values Values) bool {
+	// The strategy is repeated to a "fixed point" where further runs don't end
+	// up changing the board in any way.
 RepeatStrategy:
 	for {
 		for _, unit := range unitlist {
@@ -518,15 +530,9 @@ RepeatStrategy:
 				dcount[values[sq]]++
 			}
 
-			// Find a combination that has exactly two digits and appears exactly
-			// twice in the unit -- this is a twin. For example, two squares in the
-			// same row cell may have 38 as their only candidates, which means that 3
-			// and 8 must occupy these squares (though we don't know which goes
-			// where), and that no other square in the unit may have either 3 or 8.
 			var removed bool
 			for d, count := range dcount {
 				if d.Size() == 2 && count == 2 {
-					//fmt.Printf("found candidates '%s' with count 2 (unit %v)\n", d, unit)
 					// Found it! Now go over all the squares in this unit other than the
 					// ones with these exact two candidates, and eliminate both candidates
 					// from them.
@@ -548,13 +554,17 @@ RepeatStrategy:
 						}
 					}
 				}
+				// We've eliminated some values from the board, so it's not safe to
+				// proceed with this loop since dcount may hold stale values. We
+				// instead repeat the strategy on the whole board.
 				if removed {
-					fmt.Println("repeating...")
 					continue RepeatStrategy
 				}
 			}
 		}
+
+		// We went over all units and didn't remove anything in this round, so
+		// no point repeating.
 		return true
 	}
-	panic("unreachable!")
 }

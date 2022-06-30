@@ -318,34 +318,21 @@ func TestApplyTwinsStrategy(t *testing.T) {
 	// Basic test: on an empty board, leave only candidates 38 for two squares
 	// and verify that twin elimination removed what was needed.
 
-	// TODO: reinstate this
-	//v := EmptyBoard()
-	//d38 := Digits(0).Add(3).Add(8)
-	//v[30] = d38
-	//v[31] = d38
+	v := EmptyBoard()
+	d38 := Digits(0).Add(3).Add(8)
+	v[30] = d38
+	v[31] = d38
 
-	//ApplyTwinsStrategy(v)
+	ApplyTwinsStrategy(v)
 
-	//for _, sq := range []Index{27, 28, 39, 32, 33, 34, 35, 39, 40, 41, 48, 49, 50} {
-	//if v[sq].IsMember(3) || v[sq].IsMember(8) {
-	//t.Errorf("got board[%v]=%s, expect no 3 or 8", sq, v[sq])
-	//}
-	//}
-
-	b := "...8....9.873...4.6..7.......85..97...........43..75.......3....3...145.4....2..1"
-	//b := "000158000002060800030000040027030510000000000046080790050000080004070100000325000"
-	//b := "380000000000400785009020300060090000800302009000040070001070500495006000000000092"
-	vb, err := ParseBoard(b, true)
-	if err != nil {
-		log.Fatal(err)
+	for _, sq := range []Index{27, 28, 39, 32, 33, 34, 35, 39, 40, 41, 48, 49, 50} {
+		if v[sq].IsMember(3) || v[sq].IsMember(8) {
+			t.Errorf("got board[%v]=%s, expect no 3 or 8", sq, v[sq])
+		}
 	}
-	fmt.Println(Display(vb))
-
-	ApplyTwinsStrategy(vb)
-	fmt.Println(Display(vb))
 }
 
-// This board is unsolvable, but it takes the search a while to figure this
+// This board is unsolvable, and it takes the search a while to figure this
 // out.
 var impossible string = `
 . . . |. . 5 |. 8 .
@@ -461,14 +448,13 @@ func BenchmarkSolveBoardHardlong(b *testing.B) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		v, success := Solve(v, SolveOptions{})
+		_, success := Solve(v, SolveOptions{})
 		if !success {
 			log.Fatal("not solved")
 		}
 	}
 }
 
-// TODO: add benchmark for ApplyTwinsStrategy
 func BenchmarkSolveBoardHardlongRandomized(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < b.N; i++ {
@@ -476,7 +462,7 @@ func BenchmarkSolveBoardHardlongRandomized(b *testing.B) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		v, success := Solve(v, SolveOptions{Randomize: true})
+		_, success := Solve(v, SolveOptions{Randomize: true})
 		if !success {
 			log.Fatal("not solved")
 		}
@@ -488,6 +474,17 @@ func BenchmarkSolveEmpty(b *testing.B) {
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
 		_, _ = Solve(empty, SolveOptions{})
+	}
+}
+
+func BenchmarkApplyTwinsStrategy(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		v := EmptyBoard()
+		d38 := Digits(0).Add(3).Add(8)
+		v[30] = d38
+		v[31] = d38
+
+		ApplyTwinsStrategy(v)
 	}
 }
 

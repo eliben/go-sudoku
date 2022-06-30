@@ -13,7 +13,6 @@ import (
 	"github.com/eliben/go-sudoku"
 )
 
-// TODO: add real help / flags
 var statsFlag = flag.Bool("stats", false, "enable stats for solving")
 var randomizeFlag = flag.Bool("randomize", false, "randomize solving order")
 var actionFlag = flag.String("action", "solve", "action to perform: solve, count")

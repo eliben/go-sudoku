@@ -12,7 +12,7 @@ type Canvas struct {
 }
 
 var headerText = `<?xml version="1.0"?>
-<svg width="{.Width}" height="{.Height}"
+<svg width="{{.Width}}" height="{{.Height}}"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 `

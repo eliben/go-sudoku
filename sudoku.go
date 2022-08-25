@@ -2,9 +2,11 @@ package sudoku
 
 import (
 	"fmt"
+	"io"
 	"math/rand"
 	"strings"
 
+	"github.com/eliben/go-sudoku/svg"
 	"golang.org/x/exp/slices"
 )
 
@@ -339,6 +341,38 @@ func DisplayAsInput(values Values) string {
 		}
 	}
 	return sb.String()
+}
+
+func DisplayAsSVG(values Values, w io.Writer) {
+	startX := 50
+	startY := 50
+	width := 800
+	height := 800
+	cellsize := 80
+	canvas := svg.New(w, width, height)
+
+	for sq, d := range values {
+		row := sq / 9
+		col := sq % 9
+
+		x := startX + col*cellsize
+		y := startY + row*cellsize
+
+		canvas.Rect(x, y, cellsize, cellsize, "stroke:black; stroke-width:2; fill:white")
+
+		if d.Size() == 1 {
+			canvas.Text(x+cellsize/2, y+cellsize/2, d.String(), "text-anchor:middle; dominant-baseline:middle; font-family:Helvetica; font-size:32px; fill:black")
+		}
+	}
+
+	// Wider squares around 3x3 blocks
+	for br := 0; br < 3; br++ {
+		for bc := 0; bc < 3; bc++ {
+			canvas.Rect(startX+bc*cellsize*3, startY+br*cellsize*3, cellsize*3, cellsize*3, "stroke:black; stroke-width:5; fill-opacity:0.0")
+		}
+	}
+
+	canvas.End()
 }
 
 // EmptyBoard creates an "empty" Sudoku board, where each square can potentially

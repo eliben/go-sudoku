@@ -24,7 +24,6 @@ func main() {
 		fmt.Fprintln(out, "Options:")
 		flag.PrintDefaults()
 	}
-
 	flag.Parse()
 
 	switch *actionFlag {

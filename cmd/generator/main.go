@@ -27,6 +27,9 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
+	count := 0
+	maxDifficultySeen := 0.0
+
 	for {
 		var board sudoku.Values
 
@@ -61,6 +64,15 @@ func main() {
 			}
 
 			break
+		} else {
+			count++
+			if d > maxDifficultySeen {
+				maxDifficultySeen = d
+			}
+
+			if count > 0 && count%10 == 0 {
+				fmt.Printf("Tried %v boards; max difficulty seen %.2f\n", count, maxDifficultySeen)
+			}
 		}
 	}
 }

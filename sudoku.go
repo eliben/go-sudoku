@@ -343,7 +343,9 @@ func DisplayAsInput(values Values) string {
 	return sb.String()
 }
 
-func DisplayAsSVG(values Values, w io.Writer) {
+// DisplayAsSVG write the board's visual representation in SVG format into w.
+// The difficulty is emitted too.
+func DisplayAsSVG(w io.Writer, values Values, difficulty float64) {
 	startX := 50
 	startY := 50
 	width := 800
@@ -352,14 +354,13 @@ func DisplayAsSVG(values Values, w io.Writer) {
 	canvas := svg.New(w, width, height)
 
 	for sq, d := range values {
-		row := sq / 9
 		col := sq % 9
-
 		x := startX + col*cellsize
+
+		row := sq / 9
 		y := startY + row*cellsize
 
 		canvas.Rect(x, y, cellsize, cellsize, "stroke:black; stroke-width:2; fill:white")
-
 		if d.Size() == 1 {
 			canvas.Text(x+cellsize/2, y+cellsize/2, d.String(), "text-anchor:middle; dominant-baseline:middle; font-family:Helvetica; font-size:32px; fill:black")
 		}
@@ -371,6 +372,9 @@ func DisplayAsSVG(values Values, w io.Writer) {
 			canvas.Rect(startX+bc*cellsize*3, startY+br*cellsize*3, cellsize*3, cellsize*3, "stroke:black; stroke-width:5; fill-opacity:0.0")
 		}
 	}
+
+	difficultyText := fmt.Sprintf("Difficulty: %.2f out of 5", difficulty)
+	canvas.Text(startX, startY+9*cellsize+cellsize/2, difficultyText, "font-family:Helvetica; font-size:16px; fill:black")
 
 	canvas.End()
 }

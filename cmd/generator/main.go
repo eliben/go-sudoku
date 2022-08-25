@@ -58,7 +58,7 @@ func main() {
 					log.Fatal(err)
 				}
 				defer f.Close()
-				sudoku.DisplayAsSVG(board, f)
+				sudoku.DisplayAsSVG(f, board, d)
 				fmt.Println("Wrote SVG output to", *svgOutFlag)
 			}
 

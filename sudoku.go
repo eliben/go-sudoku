@@ -385,8 +385,7 @@ func findSquareWithFewestCandidates(values Values) Index {
 	return squareToTry
 }
 
-// SolveOptions is a container of options that can be taken by the
-// Solve function.
+// SolveOptions is a container of options for the Solve function.
 type SolveOptions struct {
 	// Randomize tells the solver to randomly shuffle its digit selection when
 	// attempting to guess a value for a square. For actual randomness, the
@@ -400,9 +399,11 @@ type SolveOptions struct {
 // with a board with only a single candidate per square; otherwise, it returns
 // false. The input values is not modified.
 // The solution process can be configured by providing SolveOptions.
-// Consider making SolveOptions ... so they're not mandatory, but panic if more
-// than 1.
-func Solve(values Values, options SolveOptions) (Values, bool) {
+func Solve(values Values, options ...SolveOptions) (Values, bool) {
+	if len(options) > 1 {
+		panic("Solve cannot accept more than a single SolveOptions")
+	}
+
 	squareToTry := findSquareWithFewestCandidates(values)
 
 	// If we didn't find any square with more than one candidate, the board is
@@ -416,7 +417,7 @@ func Solve(values Values, options SolveOptions) (Values, bool) {
 	}
 
 	var candidates = []uint16{1, 2, 3, 4, 5, 6, 7, 8, 9}
-	if options.Randomize {
+	if len(options) > 0 && options[0].Randomize {
 		rand.Shuffle(len(candidates), func(i, j int) {
 			candidates[i], candidates[j] = candidates[j], candidates[i]
 		})
@@ -428,7 +429,7 @@ func Solve(values Values, options SolveOptions) (Values, bool) {
 		if values[squareToTry].IsMember(d) {
 			vcopy := slices.Clone(values)
 			if assign(vcopy, squareToTry, d) {
-				if vresult, solved := Solve(vcopy, options); solved {
+				if vresult, solved := Solve(vcopy, options...); solved {
 					return vresult, true
 				}
 			}

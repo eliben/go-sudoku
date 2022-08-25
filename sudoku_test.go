@@ -144,7 +144,7 @@ func TestSolveBoard(t *testing.T) {
 		log.Fatal(err)
 	}
 	vcopy := slices.Clone(v)
-	vs, success := Solve(v, SolveOptions{})
+	vs, success := Solve(v)
 	if !slices.Equal(v, vcopy) {
 		t.Errorf("Solve modified board; before=%v, after=%v", vcopy, v)
 	}
@@ -159,7 +159,7 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v2, success2 := Solve(v2, SolveOptions{})
+	v2, success2 := Solve(v2)
 
 	if !success2 || !IsSolved(v2) {
 		t.Errorf("expect easy board to be solved by search")
@@ -170,7 +170,7 @@ func TestSolveBoard(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	v3, success3 := Solve(v3, SolveOptions{})
+	v3, success3 := Solve(v3)
 
 	if !success3 || !IsSolved(v3) {
 		t.Errorf("expect hardboard2 to be solved by search")
@@ -199,7 +199,7 @@ func TestSolveWithStats(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, _ = Solve(v, SolveOptions{})
+		_, _ = Solve(v)
 
 		if Stats.NumAssigns == 0 {
 			t.Errorf("got NumAssigns==0")
@@ -358,7 +358,7 @@ func TestImpossible(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		v, success := Solve(v, SolveOptions{})
+		v, success := Solve(v)
 
 		if success || IsSolved(v) {
 			t.Errorf("got solved board for impossible")
@@ -396,7 +396,7 @@ func TestSolveHardest(t *testing.T) {
 				t.Errorf("ApplyTwinsStrategy returns contradiction")
 			}
 
-			vs, success := Solve(v, SolveOptions{})
+			vs, success := Solve(v)
 			if !success || !IsSolved(vs) {
 				t.Errorf("not solved board %v", board)
 			}
@@ -412,7 +412,7 @@ func TestSolveHardest(t *testing.T) {
 
 func TestSolveEmpty(t *testing.T) {
 	vals := EmptyBoard()
-	vres, solved := Solve(vals, SolveOptions{})
+	vres, solved := Solve(vals)
 	if !solved {
 		t.Errorf("want Solve(empty) to report success")
 	}
@@ -448,7 +448,7 @@ func BenchmarkSolveBoardHardlong(b *testing.B) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, success := Solve(v, SolveOptions{})
+		_, success := Solve(v)
 		if !success {
 			log.Fatal("not solved")
 		}
@@ -473,7 +473,7 @@ func BenchmarkSolveEmpty(b *testing.B) {
 	// Benchmark how long it takes to "solve" an empty board.
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
-		_, _ = Solve(empty, SolveOptions{})
+		_, _ = Solve(empty)
 	}
 }
 
@@ -494,6 +494,6 @@ func BenchmarkSolveEmptyRandomized(b *testing.B) {
 	rand.Seed(time.Now().UnixNano())
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
-		_, _ = Solve(empty, SolveOptions{})
+		_, _ = Solve(empty)
 	}
 }

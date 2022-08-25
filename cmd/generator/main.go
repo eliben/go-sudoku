@@ -11,6 +11,9 @@ import (
 	"github.com/eliben/go-sudoku"
 )
 
+// Note: trying to generate difficult boards with low hintcount may take a long
+// time.
+
 var symFlag = flag.Bool("sym", false, "generate a symmetrical puzzle")
 var diffFlag = flag.Float64("diff", 2.5, "minimal difficulty for generated puzzle")
 var hintCountFlag = flag.Int("hintcount", 28, "hint count for generation; higher counts lead to easier puzzles")

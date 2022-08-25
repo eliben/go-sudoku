@@ -14,8 +14,10 @@ import (
 // though higher hint counts generally correlate with easier boards. It's
 // recommended to generate a large number of boards using this function and
 // evaluate their difficulty separately using EvaluateDifficulty.
-// Note: make sure the default rand source is seeded if you really want to get
-// random boards.
+// Notes:
+//  * Make sure the default rand source is seeded if you really want to get
+//    random boards.
+//  * This function may take a while to run when given a low hintCount.
 func Generate(hintCount int) Values {
 	empty := EmptyBoard()
 	board, solved := Solve(empty, SolveOptions{Randomize: true})

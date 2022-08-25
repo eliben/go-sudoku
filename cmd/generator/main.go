@@ -11,9 +11,6 @@ import (
 	"github.com/eliben/go-sudoku"
 )
 
-// TODO: if asked to generate easy ones, like diff=2, hintcount=30 it generates
-// fully filled boards -- this should not happen!
-
 var symFlag = flag.Bool("sym", false, "generate a symmetrical puzzle")
 var diffFlag = flag.Float64("diff", 2.5, "minimal difficulty for generated puzzle")
 var hintCountFlag = flag.Int("hintcount", 28, "hint count for generation; higher counts lead to easier puzzles")
@@ -48,6 +45,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		if d >= *diffFlag {
 			fmt.Println(sudoku.DisplayAsInput(board))
 			fmt.Printf("Difficulty: %.2f\n", d)

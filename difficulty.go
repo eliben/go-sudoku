@@ -2,6 +2,8 @@ package sudoku
 
 import (
 	"fmt"
+
+	"golang.org/x/exp/slices"
 )
 
 // EvaluateDifficulty evaluates the difficulty of a Sudoku puzzle heuristically
@@ -58,10 +60,11 @@ func EvaluateDifficulty(values Values) (float64, error) {
 	}
 
 	// Run elimination and count how many hints are on the board after it.
-	if !EliminateAll(values) {
+	vcopy := slices.Clone(values)
+	if !EliminateAll(vcopy) {
 		return 0, fmt.Errorf("contradiction in board")
 	}
-	hintsAfterElimination := CountHints(values)
+	hintsAfterElimination := CountHints(vcopy)
 
 	// Run a number of randomized searches and count the average search count.
 	EnableStats = true
@@ -69,7 +72,7 @@ func EvaluateDifficulty(values Values) (float64, error) {
 	iterations := 10
 	for i := 0; i < iterations; i++ {
 		Stats.Reset()
-		_, solved := Solve(values, SolveOptions{Randomize: true})
+		_, solved := Solve(vcopy, SolveOptions{Randomize: true})
 		if !solved {
 			return 0, fmt.Errorf("cannot solve")
 		}

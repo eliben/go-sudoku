@@ -480,7 +480,7 @@ func Solve(values Values, options ...SolveOptions) (Values, bool) {
 // solutions were found, an empty list is returned. max can specify the
 // (approximate) maximal number of solutions to find; a value <= 0 means "all of
 // them". Often more solutions than max will be returned, but not a lot more
-// (maybe 2-3x as many).
+// (maybe 2-3x as many). values is not modified.
 // Warning: this function can take a LONG time to run for boards with multiple
 // solutions, and it can consume enormous amounts of memory because it has to
 // remember each solution it finds. For some boards it will run forever (e.g.

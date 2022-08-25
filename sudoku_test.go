@@ -237,6 +237,7 @@ func TestSolveAll(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	vcopy := slices.Clone(v)
 	vs := SolveAll(v, -1)
 
 	if len(vs) != 1 {
@@ -244,6 +245,10 @@ func TestSolveAll(t *testing.T) {
 	}
 	if !IsSolved(vs[0]) {
 		t.Errorf("got %v, want solved board", vs[0])
+	}
+
+	if !slices.Equal(v, vcopy) {
+		t.Errorf("SolveAll modified its input values")
 	}
 
 	// Now generate a multiple-solution board, by replacing all instances

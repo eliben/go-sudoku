@@ -44,5 +44,18 @@ a printable SVG format, like this:
 
 ![SVG board sample](/doc/genb.svg)
 
-You can invoke the `cmd/generator` command with the `-svgout` flag to see this in action.
+You can invoke the `cmd/generator` command with the `-svgout` flag to see this
+in action, or use the web frontend.
 
+## Web frontend
+
+This repository includes a web frontend for generating Sudoku puzzles, by
+compiling the Go code to WebAssembly. To run it locally:
+
+
+		$ cd cmd/wasm
+		$ make build
+		$ make serve
+
+This will run a local webserver; open http://localhost:8899 in your browser
+to generate puzzles!

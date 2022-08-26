@@ -31,17 +31,21 @@
     let symCheckbox = document.querySelector("#symmetrical");
     let hintValue = document.querySelector("#hintcount");
     let svgoutDiv = document.querySelector("#svgout");
+    let generateButton = document.querySelector("#generate");
 
-    document.querySelector("#generate").addEventListener("mousedown", () => {
+    generateButton.addEventListener("mousedown", () => {
       console.log(`will call go now, with symmetrical=${symCheckbox.checked}, hint=${hintValue.value}`);
 
       svgoutDiv.innerHTML = "... generating ...";
+      generateButton.disabled = true;
+
       setTimeout(() => {
         // This is in a setTimeout to let the browser render the previous HTML
         // update before this function call occupies it.
         let svgText = generateBoard(parseInt(hintValue, 10), symCheckbox.checked);
         svgoutDiv.innerHTML = svgText;
+        generateButton.disabled = false;
       }, 0);
     });
   </script>
-</html>  
+</html>

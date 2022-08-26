@@ -42,3 +42,7 @@ flag is provided:
 `go-sudoku` includes some rudimentary functionality to emit a Sudoku board into
 a printable SVG format, like this:
 
+![SVG board sample](/doc/genb.svg)
+
+You can invoke the `cmd/generator` command with the `-svgout` flag to see this in action.
+

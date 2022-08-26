@@ -1,19 +1,42 @@
-<html>  
-    <head>
-        <meta charset="utf-8"/>
-        <script src="wasm_exec.js"></script>
-        <script>
-            const go = new Go();
-            WebAssembly.instantiateStreaming(fetch("gosudoku.wasm"), go.importObject).then((result) => {
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("gosudoku.wasm"), go.importObject).then((result) => {
                 go.run(result.instance);
-            });
-        </script>
-    </head>
-    <body>
-         <textarea id="jsoninput" name="jsoninput" cols="80" rows="20"></textarea>
-         <input id="button" type="submit" name="button" value="pretty json"/>
-         <textarea id="jsonoutput" name="jsonoutput" cols="80" rows="20"></textarea>
-    </body>
-    <script>
-     </script>
+     });
+  </script>
+<style>
+  .spacerheader {
+    width: 10px;
+  }
+</style>
+</head>
+<body>
+  <table id="control">
+    <tr>
+      <td>Hint count: <input size="3" id="hintcount" value="26"></input></td>
+      <td class="spacerheader"></td>
+      <td><input type="checkbox" id="symmetrical">Symmetrical</input></td>
+      <td class="spacerheader"></td>
+      <td><button id="generate" title="Generate puzzle">Generate</button></td>
+    </tr>
+  </table>
+  <hr/>
+  <div id="svgout"></div>
+</body>
+  <script>
+    let symCheckbox = document.querySelector("#symmetrical");
+    let hintValue = document.querySelector("#hintcount");
+    let svgoutDiv = document.querySelector("#svgout");
+
+    document.querySelector("#generate").addEventListener("mousedown", () => {
+      console.log(`will call go now, with symmetrical=${symCheckbox.checked}, hint=${hintValue.value}`);
+
+      let svgText = generateBoard(parseInt(hintValue, 10), symCheckbox.checked);
+      svgoutDiv.innerHTML = svgText;
+    });
+  </script>
 </html>  

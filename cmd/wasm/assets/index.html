@@ -1,0 +1,19 @@
+<html>  
+    <head>
+        <meta charset="utf-8"/>
+        <script src="wasm_exec.js"></script>
+        <script>
+            const go = new Go();
+            WebAssembly.instantiateStreaming(fetch("gosudoku.wasm"), go.importObject).then((result) => {
+                go.run(result.instance);
+            });
+        </script>
+    </head>
+    <body>
+         <textarea id="jsoninput" name="jsoninput" cols="80" rows="20"></textarea>
+         <input id="button" type="submit" name="button" value="pretty json"/>
+         <textarea id="jsonoutput" name="jsonoutput" cols="80" rows="20"></textarea>
+    </body>
+    <script>
+     </script>
+</html>  

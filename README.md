@@ -12,8 +12,8 @@ into three parts:
   strings, emitting boards back to output and solving Sudoku puzzles. The
   basic solver uses constraint propagation and recursive search and is based on
   [Peter Norvig's old post](https://norvig.com/sudoku.html), although the Go
-  code is much faster than Norvig's Python (about 100x faster, also due to some
-  optimizations in board representation).
+  code is about 100x faster than Norvig's Python (faster compiled language but
+  also an optimized board representation).
 
   Contains additional functionality like finding _all_ the solutions of a given
   puzzle and not just a single solution.
@@ -36,3 +36,9 @@ Some tests take a while to run, so they are excluded if the `-short` testing
 flag is provided:
 
     $ go test -v -short ./...
+
+## Generating printable boards
+
+`go-sudoku` includes some rudimentary functionality to emit a Sudoku board into
+a printable SVG format, like this:
+

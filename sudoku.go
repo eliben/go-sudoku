@@ -349,7 +349,7 @@ func DisplayAsSVG(w io.Writer, values Values, difficulty float64) {
 	startX := 50
 	startY := 50
 	width := 800
-	height := 800
+	height := 900
 	cellsize := 80
 	canvas := svg.New(w, width, height)
 

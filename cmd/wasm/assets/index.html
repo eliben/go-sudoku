@@ -35,8 +35,13 @@
     document.querySelector("#generate").addEventListener("mousedown", () => {
       console.log(`will call go now, with symmetrical=${symCheckbox.checked}, hint=${hintValue.value}`);
 
-      let svgText = generateBoard(parseInt(hintValue, 10), symCheckbox.checked);
-      svgoutDiv.innerHTML = svgText;
+      svgoutDiv.innerHTML = "... generating ...";
+      setTimeout(() => {
+        // This is in a setTimeout to let the browser render the previous HTML
+        // update before this function call occupies it.
+        let svgText = generateBoard(parseInt(hintValue, 10), symCheckbox.checked);
+        svgoutDiv.innerHTML = svgText;
+      }, 0);
     });
   </script>
 </html>  

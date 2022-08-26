@@ -42,11 +42,6 @@ func main() {
 			board = sudoku.Generate(*hintCountFlag)
 		}
 
-		sols := sudoku.SolveAll(board, -1)
-		if len(sols) != 1 {
-			continue
-		}
-
 		d, err := sudoku.EvaluateDifficulty(board)
 		if err != nil {
 			log.Fatal(err)

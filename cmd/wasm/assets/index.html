@@ -1,12 +1,14 @@
 <html>
 <head>
   <meta charset="utf-8"/>
+  <!-- This file is copied from `$(go env GOROOT)/misc/wasm`-->
   <script src="wasm_exec.js"></script>
   <script>
     const go = new Go();
-    WebAssembly.instantiateStreaming(fetch("gosudoku.wasm"), go.importObject).then((result) => {
-                go.run(result.instance);
-     });
+    WebAssembly.instantiateStreaming(fetch("gosudoku.wasm"), go.importObject).then(
+      (result) => {
+        go.run(result.instance);
+      });
   </script>
 <style>
   .spacerheader {
@@ -40,8 +42,8 @@
       generateButton.disabled = true;
 
       setTimeout(() => {
-        // This is in a setTimeout to let the browser render the previous HTML
-        // update before this function call occupies it.
+        // This setTimeout lets the browser render the previous HTML
+        // update before the generateBoard call blocks it.
         let svgText = generateBoard(parseInt(hintValue, 10), symCheckbox.checked);
         svgoutDiv.innerHTML = svgText;
         generateButton.disabled = false;

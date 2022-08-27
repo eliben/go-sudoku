@@ -1,3 +1,4 @@
+// Simple static file server to serve the contents of the `assets` sub-directory
 package main
 
 import (

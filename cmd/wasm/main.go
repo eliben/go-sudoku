@@ -4,19 +4,27 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/rand"
 	"syscall/js"
+	"time"
 
 	"github.com/eliben/go-sudoku"
 )
 
 func main() {
-	fmt.Println("Console log: Go wasm")
-	//fmt.Println(generateBoardSvg(30, false))
-	js.Global().Set("generateBoard", jsonWrapper())
+	rand.Seed(time.Now().UnixNano())
+	fmt.Println("go-sudoku wasm")
+	js.Global().Set("generateBoard", jsGenerateBoard)
 	<-make(chan bool)
 }
 
-func generateBoardSvg(hintCount int, symmetrical bool) string {
+var jsGenerateBoard = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	if len(args) != 2 {
+		return fmt.Sprintf("got %v args, want 2", len(args))
+	}
+	hintCount := args[0].Int()
+	symmetrical := args[1].Bool()
+
 	var board sudoku.Values
 	if symmetrical {
 		board = sudoku.GenerateSymmetrical(hintCount)
@@ -32,17 +40,4 @@ func generateBoardSvg(hintCount int, symmetrical bool) string {
 	var buf bytes.Buffer
 	sudoku.DisplayAsSVG(&buf, board, d)
 	return buf.String()
-}
-
-func jsonWrapper() js.Func {
-	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		if len(args) != 2 {
-			return fmt.Sprintf("got %v args, want 2", len(args))
-		}
-		hintCount := args[0].Int()
-		symmetrical := args[1].Bool()
-		brd := generateBoardSvg(hintCount, symmetrical)
-		return brd
-	})
-	return jsonFunc
-}
+})

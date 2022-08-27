@@ -23,6 +23,14 @@ into three parts:
   by me. Contains additional functionality like generating _symmetrical_
   Sudoku boards.
 
+  Note: generating hard-to-solve boards with a single solution is fairly
+  difficult. The best way to do this in practice seems to be to generate a
+  _large_ number of boards, sifting through them to find the hardest ones.
+  These boards can then be transformed in a myriad ways to retain the same
+  difficulty but look and feel very different (through swapping rows and
+  columns, rotations, and permuting the existing hint digits). Therefore,
+  a single genuienly hard board can be replayed in many different ways.
+
 * `difficulty.go`: code to evaluate the difficulty of a given Sudoku puzzle;
   the approach was partially inspired by the paper "Sudoku Puzzles Generating:
   from Easy to Evil" by Xiang-Sun ZHANG's research group.

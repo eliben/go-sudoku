@@ -19,7 +19,7 @@
 <body>
   <table id="control">
     <tr>
-      <td>Hint count: <input size="3" id="hintcount" value="26"></input></td>
+      <td>Hint count: <input size="3" id="hintcount" value="30"></input></td>
       <td class="spacerheader"></td>
       <td><input type="checkbox" id="symmetrical">Symmetrical</input></td>
       <td class="spacerheader"></td>
@@ -44,7 +44,7 @@
       setTimeout(() => {
         // This setTimeout lets the browser render the previous HTML
         // update before the generateBoard call blocks it.
-        let svgText = generateBoard(parseInt(hintValue, 10), symCheckbox.checked);
+        let svgText = generateBoard(parseInt(hintValue.value, 10), symCheckbox.checked);
         svgoutDiv.innerHTML = svgText;
         generateButton.disabled = false;
       }, 0);

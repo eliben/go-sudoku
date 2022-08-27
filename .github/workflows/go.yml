@@ -1,4 +1,4 @@
-name: Go
+name: Run Go tests
 
 on:
   push:
@@ -19,4 +19,5 @@ jobs:
         go-version: 1.18
 
     - name: Test
+      # Running ./... won't work since cmd/wasm needs js tag settings.
       run: go test -v . ./svg

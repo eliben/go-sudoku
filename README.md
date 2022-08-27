@@ -45,11 +45,11 @@ a printable SVG format, like this:
 ![SVG board sample](/doc/genb.svg)
 
 You can invoke the `cmd/generator` command with the `-svgout` flag to see this
-in action, or use the web frontend.
+in action, or use the web interface.
 
-## Web frontend
+## Web interface
 
-This repository includes a web frontend for generating Sudoku puzzles, by
+This repository includes a web interface for generating Sudoku puzzles, by
 compiling the Go code to WebAssembly. To run it locally:
 
 
@@ -59,3 +59,6 @@ compiling the Go code to WebAssembly. To run it locally:
 
 This will run a local webserver; open http://localhost:8899 in your browser
 to generate puzzles!
+
+The repository also has a GitHub actions setup to automatically deploy the web
+interface to https://eliben.github.io/go-sudoku on each commit.

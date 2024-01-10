@@ -1,13 +1,11 @@
 package sudoku
 
 import (
-	"math/rand"
 	"testing"
-	"time"
 )
 
 func TestGenerate(t *testing.T) {
-	board := Generate(30)
+	board, _ := Generate(30)
 	vs := SolveAll(board, -1)
 	if len(vs) != 1 {
 		t.Errorf("got %v solutions, want 1", len(vs))
@@ -16,12 +14,12 @@ func TestGenerate(t *testing.T) {
 	if !IsSolved(vs[0]) {
 		t.Errorf("got unsolved board")
 	}
+
 }
 
 func TestGenerateSymmetrical(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
 	//for {
-	board := GenerateSymmetrical(30)
+	board, _ := GenerateSymmetrical(30)
 	vs := SolveAll(board, -1)
 	if len(vs) != 1 {
 		t.Errorf("got %v solutions, want 1", len(vs))

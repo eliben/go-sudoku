@@ -3,7 +3,7 @@ package sudoku
 import (
 	"fmt"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 // EvaluateDifficulty evaluates the difficulty of a Sudoku puzzle heuristically
@@ -13,12 +13,12 @@ import (
 //
 // The heuristics are based on 4 factors:
 //
-// 1. How many hints (filled-in squares) the board has.
-// 2. How many hints remain after running a round of elimination (first-order
-//    Sudoku solving value deduction).
-// 3. How many hints does a row or column with the minimal number of hints have
-// 4. How many guesses a backtracking search requires to solve the board
-//    (averaged over multiple runs).
+//  1. How many hints (filled-in squares) the board has.
+//  2. How many hints remain after running a round of elimination (first-order
+//     Sudoku solving value deduction).
+//  3. How many hints does a row or column with the minimal number of hints have
+//  4. How many guesses a backtracking search requires to solve the board
+//     (averaged over multiple runs).
 //
 // This approach was partially inspired by the paper "Sudoku Puzzles Generating:
 // from Easy to Evil" by Xiang-Sun ZHANG's research group.

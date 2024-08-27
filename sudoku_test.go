@@ -3,12 +3,10 @@ package sudoku
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"strings"
 	"testing"
-	"time"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 func TestInit(t *testing.T) {
@@ -461,7 +459,6 @@ func BenchmarkSolveBoardHardlong(b *testing.B) {
 }
 
 func BenchmarkSolveBoardHardlongRandomized(b *testing.B) {
-	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < b.N; i++ {
 		v, err := ParseBoard(hardlong, true)
 		if err != nil {
@@ -496,7 +493,6 @@ func BenchmarkApplyTwinsStrategy(b *testing.B) {
 func BenchmarkSolveEmptyRandomized(b *testing.B) {
 	// Benchmark how long it takes to "solve" an empty board,
 	// with randomization. Each solution will be different.
-	rand.Seed(time.Now().UnixNano())
 	empty := EmptyBoard()
 	for i := 0; i < b.N; i++ {
 		_, _ = Solve(empty)

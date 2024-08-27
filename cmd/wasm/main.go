@@ -6,15 +6,12 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"math/rand"
 	"syscall/js"
-	"time"
 
 	"github.com/eliben/go-sudoku"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
 	fmt.Println("go-sudoku wasm")
 
 	// Export the jsGenerateBoard function to JS.

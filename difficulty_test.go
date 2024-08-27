@@ -2,15 +2,12 @@ package sudoku
 
 import (
 	"log"
-	"math/rand"
 	"testing"
-	"time"
 
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 func TestEvaluateDifficulty(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
 	getDifficulty := func(board string) float64 {
 		v, err := ParseBoard(board, false)
 		if err != nil {

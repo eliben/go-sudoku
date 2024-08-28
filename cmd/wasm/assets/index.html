@@ -1,21 +1,14 @@
 <html>
+
 <head>
-  <meta charset="utf-8"/>
-  <!-- This file is copied from `$(go env GOROOT)/misc/wasm`-->
-  <script src="wasm_exec.js"></script>
-  <script>
-    const go = new Go();
-    WebAssembly.instantiateStreaming(fetch("gosudoku.wasm"), go.importObject).then(
-      (result) => {
-        go.run(result.instance);
-      });
-  </script>
-<style>
-  .spacerheader {
-    width: 10px;
-  }
-</style>
+  <meta charset="utf-8" />
+  <style>
+    .spacerheader {
+      width: 10px;
+    }
+  </style>
 </head>
+
 <body>
   <table id="control">
     <tr>
@@ -26,28 +19,45 @@
       <td><button id="generate" title="Generate puzzle">Generate</button></td>
     </tr>
   </table>
-  <hr/>
+  <hr />
   <div id="svgout"></div>
 </body>
-  <script>
-    let symCheckbox = document.querySelector("#symmetrical");
-    let hintValue = document.querySelector("#hintcount");
-    let svgoutDiv = document.querySelector("#svgout");
-    let generateButton = document.querySelector("#generate");
+<script>
+  const worker = new Worker('worker.js');
+  let symCheckbox = document.querySelector("#symmetrical");
+  let hintValue = document.querySelector("#hintcount");
+  let svgoutDiv = document.querySelector("#svgout");
+  let generateButton = document.querySelector("#generate");
 
-    generateButton.addEventListener("mousedown", () => {
-      console.log(`will call go now, with symmetrical=${symCheckbox.checked}, hint=${hintValue.value}`);
+  worker.onmessage = ({ data }) => {
+    let { action, payload } = data;
 
-      svgoutDiv.innerHTML = "... generating ...";
-      generateButton.disabled = true;
-
-      setTimeout(() => {
-        // This setTimeout lets the browser render the previous HTML
-        // update before the generateBoard call blocks it.
-        let svgText = generateBoard(parseInt(hintValue.value, 10), symCheckbox.checked);
+    switch (action) {
+      case "log":
+        console.log(`worker.onmessage: ${payload}`);
+        break;
+      case "boardReady":
+        let svgText = payload;
         svgoutDiv.innerHTML = svgText;
         generateButton.disabled = false;
-      }, 0);
+        break;
+      default:
+        console.error(`worker.onmessage: unknown action ${action}`);
+    }
+  };
+
+  generateButton.addEventListener("mousedown", () => {
+    svgoutDiv.innerHTML = "... generating ...";
+    generateButton.disabled = true;
+
+    worker.postMessage({
+      action: "generate",
+      payload: {
+        hint: parseInt(hintValue.value, 10),
+        symmetrical: symCheckbox.checked
+      }
     });
-  </script>
+  });
+</script>
+
 </html>

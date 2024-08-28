@@ -60,7 +60,6 @@ in action, or use the web interface.
 This repository includes a web interface for generating Sudoku puzzles, by
 compiling the Go code to WebAssembly. To run it locally:
 
-
 		$ cd cmd/wasm
 		$ make build
 		$ make serve
